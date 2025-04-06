@@ -12,6 +12,9 @@ import { Demo } from "./pages/Demo";
 import GlucoseRecords from "./pages/GlucoseRecords";
 import BloodPressureRecords from "./pages/BloodPressureRecords";
 import PulseRecords from "./pages/PulseRecords";
+import WeightRecords from "./pages/WeightRecords";
+import AllergyRecords from "./pages/AllergyRecords";
+import MedicalHistoryRecords from "./pages/MedicalHistoryRecords";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -31,6 +34,9 @@ export const router = createBrowserRouter(
         <Route path="/records/glucose" element={<GlucoseRecords/>}/>
         <Route path="/records/bloodpressure" element={<BloodPressureRecords/>}/>
         <Route path="/records/pulse" element={<PulseRecords/>}/>
+        <Route path="/records/weight" element={<WeightRecords/>}/>
+        <Route path="/records/allergies" element={<AllergyRecords/>}/>
+        <Route path="/records/medicalhistory" element={<MedicalHistoryRecords/>}/>
       </Route>
     )
 );
