@@ -15,6 +15,9 @@ import PulseRecords from "./pages/PulseRecords";
 import WeightRecords from "./pages/WeightRecords";
 import AllergyRecords from "./pages/AllergyRecords";
 import MedicalHistoryRecords from "./pages/MedicalHistoryRecords";
+import PersonalAntecedentRecords from "./pages/PersonalAntecedent";
+import MedicationRecords from "./pages/MedicationRecords";
+
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -37,6 +40,8 @@ export const router = createBrowserRouter(
         <Route path="/records/weight" element={<WeightRecords/>}/>
         <Route path="/records/allergies" element={<AllergyRecords/>}/>
         <Route path="/records/medicalhistory" element={<MedicalHistoryRecords/>}/>
+        <Route path="/records/personalhistory" element={<PersonalAntecedentRecords/>}/>
+        <Route path="/records/medication" element={<MedicationRecords/>}/>
       </Route>
     )
 );
