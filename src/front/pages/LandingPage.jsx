@@ -5,17 +5,16 @@ const LandingPage = () => {
     return (
         <div className="d-flex flex-column min-vh-100">
             {/* Hero Section */}
-            <section className="position-relative overflow-hidden bg-light" style={{ minHeight: "70vh" }}>
+            <section className="position-relative bg-light" style={{ minHeight: "70vh" }}>
                 <div className="position-absolute top-0 start-0 w-100 h-100">
                     <img
                         src="src/front/assets/img/medical-enrollment-form-document-medicare-concept.jpeg"
-                        alt="Medical form on desktop"
+                        alt="Formulario de registro en el ordenador"
                         className="img-fluid w-100 h-100 object-fit-cover"
-                        style={{ transform: "scale(1.1)", objectFit: "cover" }}
                     />
                     <div className="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75"></div>
                 </div>
-                <div className="container position-relative z-1 d-flex align-items-center" style={{ minHeight: "70vh" }}>
+                <div className="container position-relative d-flex align-items-center" style={{ minHeight: "70vh" }}>
                     <div className="row">
                         <div className="col-lg-6 bg-white bg-opacity-75 p-4 rounded">
                             <span className="badge bg-primary text-white mb-2">
