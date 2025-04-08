@@ -17,6 +17,7 @@ import AllergyRecords from "./pages/AllergyRecords";
 import MedicalHistoryRecords from "./pages/MedicalHistoryRecords";
 import PersonalAntecedentRecords from "./pages/PersonalAntecedent";
 import MedicationRecords from "./pages/MedicationRecords";
+import HeightRecords from "./pages/HeightRecords";
 
 
 export const router = createBrowserRouter(
@@ -38,6 +39,7 @@ export const router = createBrowserRouter(
         <Route path="/records/bloodpressure" element={<BloodPressureRecords/>}/>
         <Route path="/records/pulse" element={<PulseRecords/>}/>
         <Route path="/records/weight" element={<WeightRecords/>}/>
+        <Route path="/records/height" element={<HeightRecords/>}/>
         <Route path="/records/allergies" element={<AllergyRecords/>}/>
         <Route path="/records/medicalhistory" element={<MedicalHistoryRecords/>}/>
         <Route path="/records/personalhistory" element={<PersonalAntecedentRecords/>}/>
