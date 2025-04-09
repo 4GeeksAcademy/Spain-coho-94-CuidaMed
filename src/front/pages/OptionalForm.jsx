@@ -1,5 +1,8 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import SuccessModal from "../components/SuccessModal";
+import ErrorModal from "../components/ErrorModal";
+import useGlobalReducer from "../hooks/useGlobalReducer";
 
 const totalSteps = 3;
 
@@ -34,6 +37,7 @@ const physicalActivityOptions = [
 ]
 
 function OptionalForm() {
+  const { store, dispatch } = useGlobalReducer();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     userName: "",
@@ -49,6 +53,12 @@ function OptionalForm() {
   const [errors, setErrors] = useState({});
   const [age, setAge] = useState(null)
   const [imc, setImc] = useState(null)
+
+  //Construyo estados para los modales
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (formData.birthDate) {
@@ -76,9 +86,13 @@ function OptionalForm() {
       const weightInKg = parseFloat(formData.weight);
 
       if (heightInMeters > 0 && weightInKg > 0) {
-        const calculatedBmi = weightInKg / (heightInMeters * heightInMeters);
-        setImc(calculatedBmi.toFixed(2));
+        const calculatedImc = weightInKg / (heightInMeters * heightInMeters);
+        setImc(calculatedImc.toFixed(2));
+      } else {
+        setImc(null);
       }
+    } else {
+      setImc(null);
     }
   }, [formData.height, formData.weight]);
 
@@ -155,7 +169,8 @@ function OptionalForm() {
             setAge(finalAge)
           }
         }
-        if (formData.sex === "") newErrors.sex = "Por favor selecciona una opción"
+        if (formData.sex === "") newErrors.sex = "Por favor selecciona una opción";
+        break;
       case 2:
         if (formData.height && (isNaN(formData.height) || formData.height <= 0 || formData.height > 3)) {
           newErrors.height = "Ingresa una altura válida (entre 0 y 3 metros)";
@@ -164,6 +179,7 @@ function OptionalForm() {
         if (formData.weight && (isNaN(formData.weight) || formData.weight <= 0 || formData.weight > 500)) {
           newErrors.weight = "Ingresa un peso válido (entre 0 y 500 kg)";
         }
+        break;
       case 3:
         if (formData.dietaryPreference) {
           if (formData.dietaryPreference.trim() === "") {
@@ -174,20 +190,48 @@ function OptionalForm() {
             newErrors.dietaryPreference = "El campo solo debe contener letras";
           }
         }
+        break;
     }
     setErrors(newErrors);
 
     return Object.keys(newErrors).length === 0; // Esto lo que hace es que si newErrors está vacío devuelve true y si no está vacío devuelve false
   }
 
+  const validateFinalStep = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const newErrors = {};
+
+    if (formData.dietaryPreference) {
+      if (formData.dietaryPreference.trim() === "") {
+        newErrors.dietaryPreference = "No puedes completar esta sección sólo con espacios"
+      } else if (formData.dietaryPreference.length > 100) {
+        newErrors.dietaryPreference = "La respuesta no puede contener más de 100 caracteres"
+      } else if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/.test(formData.dietaryPreference)) {
+        newErrors.dietaryPreference = "El campo solo debe contener letras";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setShowSuccessModal(false);
+    if(!validateFinalStep(e)) {
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
     try{
       const response = await fetch('URL', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${store.token}`
         },
 
         body: JSON.stringify(formData),
@@ -200,7 +244,11 @@ function OptionalForm() {
       const data = await response.json();
       console.log("Respuesta existosa", data);
 
-      setStep(1);
+      setShowSuccessModal(true);
+
+      setTimeout(() => {
+        setShowSuccessModal(false);
+        setStep(1);
       setErrors({});
       setFormData({
         userName: "",
@@ -215,8 +263,15 @@ function OptionalForm() {
       });
       setAge(null);
       setImc(null)
+      }, 3000)
+
+      
     } catch (error) {
       console.error('Error:', error);
+      setErrorMessage(error.message || "Ha ocurrido un error al procesar tu solicitud");
+      setShowErrorModal(true);
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -336,7 +391,7 @@ function OptionalForm() {
                   </label>
                   <input
                     type="number"
-                    className={`form-select form-select-lg ${errors.height ? "is-invalid" : ""}`}
+                    className={`form-control form-control-lg ${errors.height ? "is-invalid" : ""}`}
                     id="height"
                     name="height"
                     value={formData.height}
@@ -354,7 +409,7 @@ function OptionalForm() {
                   </label>
                   <input
                     type="number"
-                    className={`form-select form-select-lg ${errors.weight ? "is-invalid" : ""}`}
+                    className={`form-control form-control-lg ${errors.weight ? "is-invalid" : ""}`}
                     id="weight"
                     name="weight"
                     value={formData.weight}
@@ -435,13 +490,16 @@ function OptionalForm() {
                   </label>
                   <input
                     type="text"
-                    className="form-control form-control-lg"
+                    className={`form-control form-control-lg ${errors.dietaryPreference ? "is-invalid" : ""}`}
                     id="dietaryPreference"
                     name="dietaryPreference"
                     value={formData.dietaryPreference}
                     onChange={handleChange}
                     placeholder="Escribe tu preferencias de dieta Ej. Vegetariano"
                   />
+                  {errors.dietaryPreference && (
+                    <div className="invalid-feedback ms-4">{errors.dietaryPreference}</div>
+                  )}
                 </div>
 
                 <div className="mb-4">
@@ -475,8 +533,9 @@ function OptionalForm() {
                   <button 
                   type="submit" 
                   className="btn btn-primary btn-lg"
-                  onClick={handleSubmit}>
-                    Enviar
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}>
+                   {isSubmitting ? 'Enviando...' : "Enviar"}
                   </button>
                 </div>
               </form>
@@ -487,10 +546,10 @@ function OptionalForm() {
   }
   const ProgressBar = () => {
     return (
-      <div className="text-center py-3 border-top">
+      <div className="text-center py-2 border-top">
         <div className="container">
-          <div className="d-flex justify-content-center align-items-center mb-5 mt-2">
-            <span className="fw-medium me-3">Paso {step} de 3</span>
+          <div className="d-flex justify-content-center align-items-center mb-3 mt-2">
+            <span className="fw-medium me-3">Paso {step} de {totalSteps}</span>
             <div
               className="progress"
               style={{ height: "10px", width: "300px" }}
@@ -504,48 +563,6 @@ function OptionalForm() {
                 aria-valuemax="100"
               ></div>
             </div>
-          </div>
-          <div
-            className="d-flex justify-content-between position-relative"
-            style={{ width: "300px", margin: "0 auto" }}
-          >
-            <div
-              className={`position-relative rounded-circle ${step >= 1 ? "bg-primary" : "bg-secondary"
-                }`}
-              style={{ width: "20px", height: "20px", zIndex: "1" }}
-            >
-              {step === 1 && (
-                <span className="position-absolute bottom-100 start-50 translate-middle-x mt-2 mb-2 small">
-                  Personal
-                </span>
-              )}
-            </div>
-            <div
-              className={`position-relative rounded-circle ${step >= 2 ? "bg-primary" : "bg-secondary"
-                }`}
-              style={{ width: "20px", height: "20px", zIndex: "1" }}
-            >
-              {step === 2 && (
-                <span className="position-absolute bottom-100 start-50 translate-middle-x mb-2 mt-2 small">
-                  Médica
-                </span>
-              )}
-            </div>
-            <div
-              className={`position-relative rounded-circle ${step >= 3 ? "bg-primary" : "bg-secondary"
-                }`}
-              style={{ width: "20px", height: "20px", zIndex: "1" }}
-            >
-              {step === 3 && (
-                <span className="position-absolute bottom-100 start-50 translate-middle-x mb-2 mt-2 small">
-                  Estilo
-                </span>
-              )}
-            </div>
-            <div
-              className="position-absolute bg-secondary"
-              style={{ height: "2px", width: "100%", top: "9px", zIndex: "0" }}
-            ></div>
           </div>
         </div>
       </div>
@@ -586,6 +603,18 @@ function OptionalForm() {
         </div>
       </div>
       <ProgressBar />
+      <SuccessModal 
+        showSuccessModal={showSuccessModal}
+        modalTitle={"¡Formulario enviado con éxito!"}
+        text={"Tus datos han sido registrados correctamente."}
+      />
+      <ErrorModal
+      showErrorModal={showErrorModal}
+      modalTitle={"Error al enviar el formulario"}
+      setShowErrorModal={setShowErrorModal}
+      errorMessage={errorMessage}
+      text={"Por favor, inténtalo de nuevo más tarde."}
+      />
     </div>
   );
 }
