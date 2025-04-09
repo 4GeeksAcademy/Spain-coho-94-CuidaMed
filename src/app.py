@@ -66,6 +66,7 @@ CORS(app)
 
 
 # Handle/serialize errors like a JSON object
+#Tengamos algún cambio
 
 
 @app.errorhandler(APIException)
