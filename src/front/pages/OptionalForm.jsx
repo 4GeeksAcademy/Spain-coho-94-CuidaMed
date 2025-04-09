@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
+import ProgressBar from "../components/ProgressBar";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 
 const totalSteps = 3;
@@ -180,17 +181,7 @@ function OptionalForm() {
           newErrors.weight = "Ingresa un peso válido (entre 0 y 500 kg)";
         }
         break;
-      case 3:
-        if (formData.dietaryPreference) {
-          if (formData.dietaryPreference.trim() === "") {
-            newErrors.dietaryPreference = "No puedes completar esta sección sólo con espacios"
-          } else if (formData.dietaryPreference.length > 100) {
-            newErrors.dietaryPreference = "La respuesta no puede contener más de 100 caracteres"
-          } else if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/.test(formData.dietaryPreference)) {
-            newErrors.dietaryPreference = "El campo solo debe contener letras";
-          }
-        }
-        break;
+
     }
     setErrors(newErrors);
 
@@ -220,13 +211,13 @@ function OptionalForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setShowSuccessModal(false);
-    if(!validateFinalStep(e)) {
+    if (!validateFinalStep(e)) {
       return;
     }
-    
+
     setIsSubmitting(true);
-    
-    try{
+
+    try {
       const response = await fetch('URL', {
         method: 'POST',
         headers: {
@@ -238,7 +229,7 @@ function OptionalForm() {
       });
 
       if (!response.ok) {
-        throw new Error('Error al crear el usuario'); 
+        throw new Error('Error al crear el usuario');
       }
 
       const data = await response.json();
@@ -249,23 +240,23 @@ function OptionalForm() {
       setTimeout(() => {
         setShowSuccessModal(false);
         setStep(1);
-      setErrors({});
-      setFormData({
-        userName: "",
-        phone: "",
-        birthDate: "",
-        sex: "",
-        height: "",
-        weight: "",
-        bloodType: "",
-        dietaryPreference: "",
-        physicalActivity: "",
-      });
-      setAge(null);
-      setImc(null)
+        setErrors({});
+        setFormData({
+          userName: "",
+          phone: "",
+          birthDate: "",
+          sex: "",
+          height: "",
+          weight: "",
+          bloodType: "",
+          dietaryPreference: "",
+          physicalActivity: "",
+        });
+        setAge(null);
+        setImc(null)
       }, 3000)
 
-      
+
     } catch (error) {
       console.error('Error:', error);
       setErrorMessage(error.message || "Ha ocurrido un error al procesar tu solicitud");
@@ -530,12 +521,12 @@ function OptionalForm() {
                   >
                     Atrás
                   </button>
-                  <button 
-                  type="submit" 
-                  className="btn btn-primary btn-lg"
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}>
-                   {isSubmitting ? 'Enviando...' : "Enviar"}
+                  <button
+                    type="submit"
+                    className="btn btn-primary btn-lg"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}>
+                    {isSubmitting ? 'Enviando...' : "Enviar"}
                   </button>
                 </div>
               </form>
@@ -543,30 +534,6 @@ function OptionalForm() {
           </>
         );
     }
-  }
-  const ProgressBar = () => {
-    return (
-      <div className="text-center py-2 border-top">
-        <div className="container">
-          <div className="d-flex justify-content-center align-items-center mb-3 mt-2">
-            <span className="fw-medium me-3">Paso {step} de {totalSteps}</span>
-            <div
-              className="progress"
-              style={{ height: "10px", width: "300px" }}
-            >
-              <div
-                className="progress-bar bg-primary"
-                role="progressbar"
-                style={{ width: `${(step / 3) * 100}%` }}
-                aria-valuenow={(step / 3) * 100}
-                aria-valuemin="0"
-                aria-valuemax="100"
-              ></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -602,18 +569,21 @@ function OptionalForm() {
           />
         </div>
       </div>
-      <ProgressBar />
-      <SuccessModal 
+      <ProgressBar
+        step={step}
+        totalSteps={totalSteps}
+      />
+      <SuccessModal
         showSuccessModal={showSuccessModal}
         modalTitle={"¡Formulario enviado con éxito!"}
         text={"Tus datos han sido registrados correctamente."}
       />
       <ErrorModal
-      showErrorModal={showErrorModal}
-      modalTitle={"Error al enviar el formulario"}
-      setShowErrorModal={setShowErrorModal}
-      errorMessage={errorMessage}
-      text={"Por favor, inténtalo de nuevo más tarde."}
+        showErrorModal={showErrorModal}
+        modalTitle={"Error al enviar el formulario"}
+        setShowErrorModal={setShowErrorModal}
+        errorMessage={errorMessage}
+        text={"Por favor, inténtalo de nuevo más tarde."}
       />
     </div>
   );
