@@ -81,4 +81,3 @@ def delete_pulse_record(record_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al eliminar el registro", "error": str(e)}), 500
-
