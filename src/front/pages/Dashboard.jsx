@@ -28,7 +28,7 @@ const Dashboard = () => {
 
             try {
                 setIsLoading(true)
-                const response = await fetch(`${backendUrl}/api/dashboard`,
+                const response = await fetch(`${backendUrl}/api/users/dashboard`,
                     {
                         headers: {
                             "Content-Type": "application/json",
@@ -43,11 +43,11 @@ const Dashboard = () => {
                 }
 
                 setDashboardInfo({
-                    lastBloodPressure: data.last_blood_pressure || undefined,
-                    lastGlucose: data.last_glucose || undefined,
-                    lastWeight: data.last_weight || undefined,
-                    lastEmergencyContact: data.last_emergency_contact || undefined,
-                    currentMedication: data.current_medication || []
+                    lastBloodPressure: data.last_blood_pressure,
+                    lastGlucose: data.last_glucose,
+                    lastWeight: data.last_weight,
+                    lastEmergencyContact: data.last_emergency_contact,
+                    currentMedication: data.current_medication
                 })
 
             } catch (error) {

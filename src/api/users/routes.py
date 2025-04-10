@@ -3,11 +3,50 @@ En este archivo están todas las rutas de Datos Generales
 Ruta /api/users/general-data
 """
 from flask import request, jsonify, Blueprint
-from api.models import db, GeneralData, Gender, BloodType, PhysicalActivity
+from api.models import db, User, GeneralData, Gender, BloodType, PhysicalActivity, BloodPressure, Glucose, Weight, Medication, EmergencyContact
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy import or_
 from datetime import datetime
 
 users_bp = Blueprint('users', __name__)
+
+
+@users_bp.route('/dashboard', methods=['GET'])
+@jwt_required()
+def user_dashboard():
+    try:
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
+        if not user:
+            return jsonify({'msg': 'No se ha encontrado este usuario'}), 404
+        # Últimas mediciones
+        last_blood_pressure = BloodPressure.query.filter_by(user_id=current_user_id).order_by(BloodPressure.manual_datetime.desc()).first()
+        last_glucose = Glucose.query.filter_by(user_id=current_user_id).order_by(Glucose.manual_datetime.desc()).first()
+        last_weight = Weight.query.filter_by(user_id=current_user_id).order_by(Weight.manual_datetime.desc()).first()
+        # Medicación actual
+        last_medication = Medication.query.filter(
+            Medication.user_id == current_user_id,
+            or_(Medication.treatment_end_date > datetime.now(), Medication.treatment_end_date == None)
+        ).order_by(Medication.registration_date.desc()).limit(3).all()
+        # Contacto de emergencia
+        emergency_contact = EmergencyContact.query.filter_by(user_id=current_user_id).first()
+        # Preparar respuesta asegurando que los objetos nulos se manejen correctamente
+        response = {
+            'last_blood_pressure': last_blood_pressure.serialize_blood_pressure() if last_blood_pressure else None,
+            'last_glucose': last_glucose.serialize_glucose() if last_glucose else None,
+            'last_weight': last_weight.serialize_weight() if last_weight else None,
+            'last_emergency_contact': emergency_contact.serialize_emergency_contact() if emergency_contact else None,
+            'current_medication': [medication.serialize_medication() for medication in last_medication] if last_medication else []
+        }
+        return jsonify(response), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+
+
+
 
 
 @users_bp.route('/general-data', methods=['GET'])
