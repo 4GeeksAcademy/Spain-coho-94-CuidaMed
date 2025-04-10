@@ -36,3 +36,27 @@ def add_pulse_record():
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al guardar el registro", "error": str(e)}), 500
+    
+@pulse_blueprint.route('/', methods=['GET'])
+@jwt_required()
+def get_weight_records():
+    current_user_id = get_jwt_identity()
+
+    try:
+
+        records = Pulse.query.filter_by(user_id=current_user_id).order_by(
+            Pulse.manual_datetime.desc()).all()
+
+        return jsonify([
+            {
+                'id': record.id,
+                'pulse': record.pulse,
+                'manual_datetime': record.manual_datetime.strftime("%d-%m-%Y %H:%M"),
+                'comments': record.comments
+            }
+            for record in records
+        ]), 200
+
+    except Exception as e:
+        return jsonify({"msg": "Error al obtener los registros", "error": str(e)}), 500
+
