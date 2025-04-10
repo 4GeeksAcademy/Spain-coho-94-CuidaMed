@@ -83,8 +83,12 @@ function OptionalForm() {
 
   useEffect(() => {
     if (formData.height && formData.weight) {
-      const heightInMeters = parseFloat(formData.height);
-      const weightInKg = parseFloat(formData.weight);
+
+      const heightInMetersReplace = formData.height.toString().replace(',', '.');
+      const weightInKgReplace = formData.weight.toString().replace(',', '.');
+
+      const heightInMeters = parseFloat(heightInMetersReplace);
+      const weightInKg = parseFloat(weightInKgReplace);
 
       if (heightInMeters > 0 && weightInKg > 0) {
         const calculatedImc = weightInKg / (heightInMeters * heightInMeters);
@@ -143,15 +147,18 @@ function OptionalForm() {
           newErrors.userName = "Necesitamos tu nombre";
         } else if (formData.userName.trim().length < 6) {
           newErrors.userName = "El nombre debe tener un mínimo de 6 caracteres";
-        } else if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/.test(formData.userName)) {
+        } else if (!/^[\p{L}\s'-]+$/u.test(formData.userName)) {// Este regex incluye letras de cualquier idioma, espacios, apóstrofes y guiones
           newErrors.userName = "El nombre solo debe contener letras";
         }
         if (!formData.phone) {
           newErrors.phone = "Número de teléfono requerido";
-        } else if (!formData.phone.startsWith("+")) {
-          newErrors.phone = "El número debe comenzar con '+' (Ejemplo: +34222331144)";
-        } else if (formData.phone.length !== 12) {
-          newErrors.phone = "El número debe tener 12 caracteres (Ejemplo: +34222331144)";
+        } else {
+          const cleanPhone = formData.phone.replace(/\s/g, ''); // Esta línea elimina espacios para la validación
+          if (!cleanPhone.startsWith("+")) {
+            newErrors.phone = "El número debe comenzar con '+' (Ejemplo: +34222331144)";
+          } else if (!/^\+\d{11}$/.test(cleanPhone)) {
+            newErrors.phone = "El número debe tener 12 caracteres (Ejemplo: +34XXXXXXXXX)";
+          }
         }
         if (!formData.birthDate) {
           newErrors.birthDate = "Fecha de nacimiento requerida";
@@ -173,12 +180,20 @@ function OptionalForm() {
         if (formData.sex === "") newErrors.sex = "Por favor selecciona una opción";
         break;
       case 2:
-        if (formData.height && (isNaN(formData.height) || formData.height <= 0 || formData.height > 3)) {
-          newErrors.height = "Ingresa una altura válida (entre 0 y 3 metros)";
+        if (formData.height) {
+          const heightValue = parseFloat(formData.height.toString().replace(',','.'));//Me aseguro de las comas se transformen en punto para el parseFloat
+
+          if (isNaN(heightValue) || heightValue <= 0 || heightValue > 3) {
+            newErrors.height = "Ingresa una altura válida (entre 0 y 3 metros)";
+          }
         }
 
-        if (formData.weight && (isNaN(formData.weight) || formData.weight <= 0 || formData.weight > 500)) {
-          newErrors.weight = "Ingresa un peso válido (entre 0 y 500 kg)";
+        if (formData.weight) {
+          const weightValue = parseFloat(formData.weight.toString().replace(',', '.'));
+          
+          if (isNaN(weightValue) || weightValue <= 0 || weightValue > 500) {
+            newErrors.weight = "Ingresa un peso válido (entre 0 y 500 kg)";
+          }
         }
         break;
 
@@ -199,7 +214,7 @@ function OptionalForm() {
         newErrors.dietaryPreference = "No puedes completar esta sección sólo con espacios"
       } else if (formData.dietaryPreference.length > 100) {
         newErrors.dietaryPreference = "La respuesta no puede contener más de 100 caracteres"
-      } else if (!/^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/.test(formData.dietaryPreference)) {
+      } else if (!/^[\p{L}\s,;.-]+$/u.test(formData.dietaryPreference)) { // Permitir letras, espacios, comas, puntos, guiones y punto y coma
         newErrors.dietaryPreference = "El campo solo debe contener letras";
       }
     }
@@ -210,7 +225,6 @@ function OptionalForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setShowSuccessModal(false);
     if (!validateFinalStep(e)) {
       return;
     }
@@ -375,7 +389,7 @@ function OptionalForm() {
                 Proporciona tus datos de salud básicos
               </p>
 
-              <form action="">
+              <form>
                 <div className="mb-4">
                   <label htmlFor="height" className="form-label fs-5">
                     Altura (mt)
@@ -471,7 +485,7 @@ function OptionalForm() {
                 Cuéntanos sobre tus preferencias y hábitos
               </p>
 
-              <form action="">
+              <form>
                 <div className="mb-4">
                   <label
                     htmlFor="dietaryPreference"

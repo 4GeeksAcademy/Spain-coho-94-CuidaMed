@@ -9,7 +9,7 @@ const ErrorModal = (props) => {
                 <div className="modal-dialog modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header bg-danger text-white">
-                            <h5 className="modal-title">{props.modalTitle}</h5>
+                            <h5 className="modal-title fw-bold">{props.modalTitle}</h5>
                             <button 
                             className="btn-close btn-close-white"
                             type="button"
@@ -20,7 +20,6 @@ const ErrorModal = (props) => {
                         </div>
                         <div className="modal-body text-center py-4">
                             <div className="mb-3">
-                                <i className="bi bi-exclamation-triangle-fill fs-1 text-danger"></i>
                                 <span className="fs-1 text-danger">⚠️</span>
                             </div>
                             <p className="mb-3">{props.errorMessage || "Ha ocurrido un error al procesar tu solicitud."}</p>

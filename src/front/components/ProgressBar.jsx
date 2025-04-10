@@ -17,6 +17,7 @@ const ProgressBar = (props) => {
                 aria-valuenow={(props.step / props.totalSteps) * 100}
                 aria-valuemin="0"
                 aria-valuemax="100"
+                aria-label={`Progreso: ${props.step} de ${props.totalSteps} pasos`}
               ></div>
             </div>
           </div>
