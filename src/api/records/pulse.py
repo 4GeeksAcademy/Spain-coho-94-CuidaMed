@@ -39,7 +39,7 @@ def add_pulse_record():
     
 @pulse_blueprint.route('/', methods=['GET'])
 @jwt_required()
-def get_weight_records():
+def get_pulse_records():
     current_user_id = get_jwt_identity()
 
     try:
@@ -59,4 +59,26 @@ def get_weight_records():
 
     except Exception as e:
         return jsonify({"msg": "Error al obtener los registros", "error": str(e)}), 500
+    
+@pulse_blueprint.route('/<int:record_id>', methods=['DELETE'])
+@jwt_required()
+def delete_pulse_record(record_id):
+    current_user_id = get_jwt_identity()
+
+    try:
+
+        record = Pulse.query.filter_by(
+            id=record_id, user_id=current_user_id).first()
+
+        if not record:
+            return jsonify({"msg": "Registro no encontrado"}), 404
+
+        db.session.delete(record)
+        db.session.commit()
+
+        return jsonify({"msg": "Registro eliminado correctamente"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al eliminar el registro", "error": str(e)}), 500
 
