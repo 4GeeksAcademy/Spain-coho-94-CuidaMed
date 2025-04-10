@@ -14,53 +14,80 @@ const Dashboard = () => {
         lastGlucose: {},
         lastWeight: {},
         lastEmergencyContact: {},
-        currentMedication: [{medication_name: "paracetamol", dosage_instructions: "Una por dia"}]
+        currentMedication: []
     })
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
     useEffect(() => {
-
+        console.log("Ha entrado en el useEffect")
         const fetchInfo = async () => {
+            console.log("Está ejecutando al funcion fetch")
             const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
-
-            const accessToken = localStorage.getItem("accessToken")
-
-            try {
-                setIsLoading(true)
-                const response = await fetch(`${backendUrl}/api/users/dashboard`,
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": "Bearer " + accessToken
-                        }
-                    });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error || "Error al acceder al area privada");
-                }
-
-                setDashboardInfo({
-                    lastBloodPressure: data.last_blood_pressure,
-                    lastGlucose: data.last_glucose,
-                    lastWeight: data.last_weight,
-                    lastEmergencyContact: data.last_emergency_contact,
-                    currentMedication: data.current_medication
-                })
-
-            } catch (error) {
-                setError(error.message)
-
-            } finally {
-                setIsLoading(false)
+            const accessToken = localStorage.getItem("accessToken");
+            
+            // Verificar si el token existe
+            if (!accessToken) {
+                setError("No se encontró el token de acceso. Por favor inicie sesión nuevamente.");
+                console.log("No ha encontrado el token")
+                return;
             }
-        }
 
-        fetchInfo()
-
-    }, [])
+            console.log("Justo antes del try")
+            try {
+                console.log("HA entrado en el try")
+                setIsLoading(true);
+                setError(""); // Limpiar errores anteriores
+                
+                console.log("Iniciando petición a:", `${backendUrl}api/users/dashboard`);
+                console.log("Token usado:", accessToken.substring(0, 10) + "..."); // Mostrar solo parte del token por seguridad
+                
+                const response = await fetch(`${backendUrl}/api/users/dashboard`, { // Añadido '/' antes de api
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${accessToken}`
+                    }
+                });
+                
+                // Mostrar información detallada de la respuesta para depuración
+                console.log("Status code:", response.status);
+                console.log("Status text:", response.statusText);
+                
+                const data = await response.json();
+                console.log("Respuesta completa:", data);
+                
+                if (!response.ok) {
+                    // Manejo específico de errores basado en códigos
+                    if (response.status === 422) {
+                        throw new Error("Error de validación: " + (data.msg || data.error || "Datos no procesables"));
+                    } else if (response.status === 401) {
+                        // Sesión expirada o token inválido
+                        localStorage.removeItem("accessToken"); // Limpiar token inválido
+                        throw new Error("Sesión expirada o no autorizada. Por favor inicie sesión nuevamente.");
+                    } else {
+                        throw new Error(data.msg || data.error || "Error al acceder al área privada");
+                    }
+                }
+                
+                // Transformar datos a camelCase y manejar valores nulos
+                setDashboardInfo({
+                    lastBloodPressure: data.last_blood_pressure || null,
+                    lastGlucose: data.last_glucose || null,
+                    lastWeight: data.last_weight || null,
+                    lastEmergencyContact: data.last_emergency_contact || null,
+                    currentMedication: Array.isArray(data.current_medication) ? data.current_medication : []
+                });
+            } catch (error) {
+                console.error("Error al obtener datos del dashboard:", error);
+                setError(error.message || "Error al comunicarse con el servidor");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        
+        fetchInfo();
+    }, []);
 
     return (
         <>
