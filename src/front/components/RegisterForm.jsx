@@ -104,7 +104,7 @@ export default function RegisterForm() {
 
       localStorage.setItem("accessToken", data.access_token)
     
-      //navigate("/login") --> Aqui debe hacer navigate to registro de Felipe
+      navigate("/optionalform") 
       
     } catch (error) {
       console.log(error.message)
