@@ -3,17 +3,19 @@ import { useState } from "react"
 import { useNavigate} from "react-router"
 
 
-const LoginForm = () => {
+export default function RegisterForm() {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
   })
   const [errors, setErrors] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
     form: "",
   })
 
@@ -41,9 +43,12 @@ const LoginForm = () => {
   // Validación del email
     if (!formData.email) {
       newErrors.email = "El email es obligatorio"
+      
       valid = false
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Por favor, introduzca un email válido"
+      
+      
       valid = false
     }
 
@@ -51,7 +56,19 @@ const LoginForm = () => {
     if (!formData.password) {
       newErrors.password = "La contraseña es obligatoria"
       valid = false
-    } 
+    } else if (formData.password.length < 8) {
+      newErrors.password = "La contraseña debe tener al menos 8 caracteres"
+      valid = false
+    }
+
+  // Validación de confirmar contraseña 
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = "Por favor, confirme la contraseña"
+      valid = false
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Las contraseñas no coinciden"
+      valid = false
+    }
 
     setErrors(newErrors)
     return valid
@@ -67,7 +84,7 @@ const LoginForm = () => {
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
-      const response = await fetch(`${backendUrl}/api/auth/login`, {
+      const response = await fetch(`${backendUrl}/api/auth/signup`, {
           method:"POST",
           headers:{
             "Content-Type": "application/json",
@@ -75,22 +92,22 @@ const LoginForm = () => {
           body:JSON.stringify({
               email: formData.email,
               password: formData.password,
-              
+              confirmarpassword: formData.confirmPassword,
           })
       })
 
       if(!response.ok){
-          throw new Error(data.error || "Error al iniciar sesión")
+          throw new Error(data.error || "Error al registrar usuario")
       }
 
       const data = await response.json()
 
       localStorage.setItem("accessToken", data.access_token)
     
-      navigate("/dashboard") 
+      //navigate("/login") --> Aqui debe hacer navigate to registro de Felipe
       
     } catch (error) {
-      setErrors({...errors, form:error.message})
+      console.log(error.message)
     } finally {
       setIsLoading(false)
     }
@@ -134,15 +151,28 @@ const LoginForm = () => {
                   {errors.password && <div className="invalid-feedback">{errors.password}</div>}
               </div>
 
+              <div className="mb-4">
+                  <label htmlFor="confirmPassword" className="form-label">Confirmar contraseña</label>
+                  <input
+                  type="password"
+                  className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  placeholder="Confirma tu contraseña"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  />
+                  {errors.confirmPassword && <div className="invalid-feedback">{errors.confirmPassword}</div>}
+              </div>
 
               <button type="submit" className="btn btn-primary w-100 mb-3 btn-blue" disabled={isLoading}>
                   {isLoading ? (
                   <>
                       <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                      Accediendo a tu cuenta...
+                      Creando tu cuenta...
                   </>
                   ) : (
-                  "Accede a tu cuenta"
+                  "Crear cuenta"
                   )}
               </button>
 
@@ -168,9 +198,9 @@ const LoginForm = () => {
 
               <div className="text-center mt-4">
                   <p className="text-muted mb-0">
-                  ¿No tienes cuenta? <br/>
-                  <a href="/signup" className="text-decoration-none">
-                    Registrate
+                  ¿Ya tienes cuenta? <br/>
+                  <a href="/login" className="text-decoration-none">
+                    Entrar
                   </a>
                   </p>
               </div>
@@ -195,4 +225,3 @@ function GoogleIcon({ className = "" }) {
     </svg>
   )
 }
-export default LoginForm
