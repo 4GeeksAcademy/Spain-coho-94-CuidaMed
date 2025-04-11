@@ -43,6 +43,7 @@ const GlucoseRecords = () => {
 
                 setGlucoseHistory(data.map(item => 
                     ({
+                        recordId:item.id,
                         glucoseValue:item.glucose,
                         measurementDate: item.manual_datetime, 
                         comments:item.comments
@@ -104,7 +105,16 @@ const GlucoseRecords = () => {
             }))
         }
     }
-
+    const formatDatetime = (datetimeStr) => {
+        const dateObj = new Date(datetimeStr);
+        const day = String(dateObj.getDate()).padStart(2, "0");
+        const month = String(dateObj.getMonth() + 1).padStart(2, "0"); // enero = 0
+        const year = dateObj.getFullYear();
+        const hours = String(dateObj.getHours()).padStart(2, "0");
+        const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+      
+        return `${day}-${month}-${year} ${hours}:${minutes}`;
+    }
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) {
@@ -113,15 +123,19 @@ const GlucoseRecords = () => {
         setLoading(true);
 
         try {
-            
-            /*const response = await fetch(`${backendUrl}/api/records/glucose` {
+            const formattedDate = formatDatetime(formData.measurementDate);
+            const formattedForm = {...formData, measurementDate: formattedDate}
+            const response = await fetch(`${backendUrl}/api/records/glucose` ,{
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // Enviamos el token a BD en el header.
-                    "Authorization": `Bearer ${store.token}`
+                    "Authorization": `Bearer ${accessToken}`
                 },
-                body: JSON.stringify(formData) //Aqui tenemos que mapear los campos del backend y frontend
+                body: JSON.stringify({
+                    glucose:formData.glucoseValue,
+                    manual_datetime:formattedDate,
+                    comments:formData.comments
+                }) 
             })
 
             const data = await response.json();
@@ -129,13 +143,23 @@ const GlucoseRecords = () => {
             if (!response.ok) {
                 throw new Error(data.error || "Error al crear el registro");
             }
-            */
-            setGlucoseHistory([formData, ...glucoseHistory]) //Actualizamos el estado pero hace falta el mapeo
+            
+            setGlucoseHistory([{
+                glucoseValue:data.glucose,
+                measurementDate:data.manual_datetime,
+                comments:data.comments,
+                recordId:data.id,
+            }, ...glucoseHistory]) 
 
         } catch (error) {
             setError(error.data)
         } finally {
             setLoading(false)
+            setFormData({
+                glucoseValue:"",
+                measurementDate: "",
+                comments: ""
+            })
         }
     }
 
@@ -145,7 +169,7 @@ const GlucoseRecords = () => {
 
     const handleDelete = async (recordId) => {
         try {
-            const response = await fetch(`${backendUrl}/api/records/glucose`,
+            const response = await fetch(`${backendUrl}/api/records/glucose/${recordId}`,
                 {
                     method: 'DELETE',
                     headers: {
@@ -156,10 +180,10 @@ const GlucoseRecords = () => {
             )
             if (!response.ok) throw new Error("Error al eliminar el registro");
             
-            setGlucoseHistory(glucoseHistory.filter((record)=> record.id !== recordId ))
+            setGlucoseHistory(glucoseHistory.filter((record)=> record.recordId !== recordId ))
             
         } catch (error) {
-            setError(...error,{ list: error.message })
+            setError({...error, list: error.message })
         }
 
     }
@@ -243,12 +267,13 @@ const GlucoseRecords = () => {
                                 </tr></thead>
                                 <tbody>
                                     {sortedHistory && sortedHistory.slice((currentPage - 1) * 7, currentPage * 7).map((data) => {
+                                        
                                         return (
-                                            <tr key={data.id}>
+                                            <tr key={data.recordId}>
                                                 <td >{data.glucoseValue}</td>
                                                 <td >{data.measurementDate}</td>
                                                 <td >{data.comments}</td>
-                                                <td><button className="btn" onClick={()=>handleDelete(data.id)}><i className="text-danger fa-solid fa-trash"></i></button></td>
+                                                <td><button className="btn" onClick={()=>handleDelete(data.recordId)}><i className="text-danger fa-solid fa-trash"></i></button></td>
                                             </tr>
                                         )
                                     })}

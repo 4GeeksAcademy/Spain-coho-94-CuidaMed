@@ -18,6 +18,11 @@ import MedicalHistoryRecords from "./pages/MedicalHistoryRecords";
 import PersonalAntecedentRecords from "./pages/PersonalAntecedent";
 import MedicationRecords from "./pages/MedicationRecords";
 import HeightRecords from "./pages/HeightRecords";
+import Login from "./pages/Login"
+import OptionalForm from "./pages/OptionalForm" 
+import  Dashboard  from "./pages/Dashboard";
+import { LayoutPrivate } from "./pages/LayoutPrivate";
+import SignUp from "./pages/SignUp";
 
 
 export const router = createBrowserRouter(
@@ -29,7 +34,7 @@ export const router = createBrowserRouter(
     // Note: The child paths of the Layout element replace the Outlet component with the elements contained in the "element" attribute of these child paths.
 
       // Root Route: All navigation will start from here.
-      <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>} >
+      <Route path="/" element={<LayoutPrivate />} errorElement={<h1>Not found!</h1>} >
 
         {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
         <Route path= "/" element={<Home />} />
@@ -44,6 +49,12 @@ export const router = createBrowserRouter(
         <Route path="/records/medicalhistory" element={<MedicalHistoryRecords/>}/>
         <Route path="/records/personalhistory" element={<PersonalAntecedentRecords/>}/>
         <Route path="/records/medication" element={<MedicationRecords/>}/>
+        <Route path= "/login" element={<Login />} />
+        <Route path="/optionalform" element={<OptionalForm />} />
+        <Route path= "/dashboard" element={<Dashboard />} />
+        <Route path= "/signup" element={<SignUp />} />
+
       </Route>
+      
     )
 );
