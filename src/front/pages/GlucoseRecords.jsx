@@ -6,7 +6,7 @@ const GlucoseRecords = () => {
     const { store, dispatch } = useGlobalReducer();
     const [formData, setFormData] = useState({
         glucoseValue: undefined,
-        measurementDate: undefined, //aqui pondremos la fecha y hora según base de datos
+        measurementDate: undefined, 
         comments: ""
     }
     )
@@ -152,7 +152,7 @@ const GlucoseRecords = () => {
             }, ...glucoseHistory]) 
 
         } catch (error) {
-            setError(error.data)
+            setError(error.message)
         } finally {
             setLoading(false)
             setFormData({

@@ -6,14 +6,11 @@ const HeightRecords = () => {
     const { store, dispatch } = useGlobalReducer();
     const [formData, setFormData] = useState({
         heightValue: undefined,
-        measurementDate: undefined, //aqui pondremos la fecha y hora según base de datos
+        measurementDate: undefined, 
         comments: ""
     }
     )
-    const [heightHistory, setHeightHistory] = useState([
-
-       
-    ])
+    const [heightHistory, setHeightHistory] = useState([])
     const [sortedHistory, setSortedHistory] = useState([]);
     const [error, setError] = useState({
         form: "",
@@ -25,18 +22,18 @@ const HeightRecords = () => {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const accessToken = localStorage.getItem("accessToken");
 
     useEffect(() => {
         const fetchRecordData = async () => {
             try {
                 
-                const response = await fetch(/* URL*/"",
+                const response = await fetch(`${backendUrl}/api/records/height`,
                     {
                         method: 'GET',
                         headers: {
                             "Content-Type": "application/json",
-                            // Enviamos el token a BD en el header.
-                            "Authorization": `Bearer ${store.token}`
+                            "Authorization": `Bearer ${accessToken}`
                         }
                     });
                 const data = await response.json();
@@ -45,12 +42,20 @@ const HeightRecords = () => {
                     throw new Error(data.error || "Error al obtener el historial de registros")
                 }
 
-                setHeightHistory(/* data.loquesea */)
+                setHeightHistory(data.map(item => 
+                    ({
+                        recordId:item.id,
+                        glucoseValue:item.height,
+                        measurementDate: item.manual_datetime, 
+                        comments:item.comments
+                    })
+                ));
 
             } catch (error) {
-                setError(...error, { list: error.message })
+                setError({...error, list: error.message })
             }
         }
+        fetchRecordData();
     }, [])
     useEffect(() => {
             if (heightHistory) {
@@ -102,7 +107,16 @@ const HeightRecords = () => {
             }))
         }
     }
-
+    const formatDatetime = (datetimeStr) => {
+        const dateObj = new Date(datetimeStr);
+        const day = String(dateObj.getDate()).padStart(2, "0");
+        const month = String(dateObj.getMonth() + 1).padStart(2, "0"); // enero = 0
+        const year = dateObj.getFullYear();
+        const hours = String(dateObj.getHours()).padStart(2, "0");
+        const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+      
+        return `${day}-${month}-${year} ${hours}:${minutes}`;
+    }
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) {
@@ -111,15 +125,19 @@ const HeightRecords = () => {
         setLoading(true);
 
         try {
-            
-            /*const response = await fetch(""/*URL backend, {
+            const formattedDate = formatDatetime(formData.measurementDate);
+            const formattedForm = {...formData, measurementDate: formattedDate}
+            const response = await fetch(`${backendUrl}/api/records/height`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // Enviamos el token a BD en el header.
-                    "Authorization": `Bearer ${store.token}`
+                    "Authorization": `Bearer ${accessToken}`
                 },
-                body: JSON.stringify(formData) //Aqui tenemos que mapear los campos del backend y frontend
+                body: JSON.stringify({
+                    height:formData.heightValue,
+                    manual_datetime:formattedDate,
+                    comments:formData.comments     
+                }) 
             })
 
             const data = await response.json();
@@ -127,13 +145,23 @@ const HeightRecords = () => {
             if (!response.ok) {
                 throw new Error(data.error || "Error al crear el registro");
             }
-            */
-            setHeightHistory([formData, ...heightHistory]) //Actualizamos el estado pero hace falta el mapeo
+            
+            setHeightHistory([{
+                heightValue:data.height,
+                measurementDate:data.manual_datetime,
+                comments:data.comments,
+                recordId:data.id,
+            }, ...heightHistory])
 
         } catch (error) {
-            setError(error.data)
+            setError(error.message)
         } finally {
             setLoading(false)
+            setFormData({
+                heightValue:"",
+                measurementDate: "",
+                comments: ""
+            })
         }
     }
 
@@ -143,21 +171,21 @@ const HeightRecords = () => {
 
     const handleDelete = async (recordId) => {
         try {
-            /*const response = await fetch(/* backend_url con el id del record"",
+            const response = await fetch( `${backendUrl}/api/records/height/${recordId}`,
                 {
                     method: 'DELETE',
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${store.token}`
+                        "Authorization": `Bearer ${accessToken}`
                     }
                 }
             )
             if (!response.ok) throw new Error("Error al eliminar el registro");
-            */
-            setHeightHistory(heightHistory.filter((record)=> record.id !== recordId ))
+            
+            setHeightHistory(heightHistory.filter((record)=> record.recordId !== recordId ))
             
         } catch (error) {
-            setError(...error,{ list: error.message })
+            setError({...error, list: error.message })
         }
 
     }
@@ -242,11 +270,11 @@ const HeightRecords = () => {
                                 <tbody>
                                     {sortedHistory && sortedHistory.slice((currentPage - 1) * 7, currentPage * 7).map((data) => {
                                         return (
-                                            <tr key={data.id}>
+                                            <tr key={data.recordId}>
                                                 <td >{data.heightValue}</td>
                                                 <td >{data.measurementDate}</td>
                                                 <td >{data.comments}</td>
-                                                <td><button className="btn" onClick={()=>handleDelete(data.id)}><i className="text-danger fa-solid fa-trash"></i></button></td>
+                                                <td><button className="btn" onClick={()=>handleDelete(data.recordId)}><i className="text-danger fa-solid fa-trash"></i></button></td>
                                             </tr>
                                         )
                                     })}
