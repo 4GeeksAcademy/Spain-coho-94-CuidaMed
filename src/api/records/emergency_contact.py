@@ -66,4 +66,29 @@ def create_emergency_contact():
         return jsonify({"msg": "Error al guardar/actualizar contacto", "error": str(e)}), 500
     
 
+@emergency_contact_blueprint.route('/', methods=['GET'])
+@jwt_required()
+def get_emergency_contact():
+    try:
+        # Obtener el ID del usuario actual
+        current_user_id = get_jwt_identity()
+        
+        # Verificar si el usuario existe
+        user = User.query.get(current_user_id)
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+        
+        # Buscar el contacto de emergencia del usuario
+        contact = EmergencyContact.query.filter_by(user_id=current_user_id).first()
+        
+        if not contact:
+            return jsonify({"message": "No se encontró contacto de emergencia para este usuario"}), 404
+        
+        return jsonify(contact.serialize_emergency_contacts()), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
 
