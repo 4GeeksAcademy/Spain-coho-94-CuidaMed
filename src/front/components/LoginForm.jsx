@@ -80,7 +80,7 @@ const LoginForm = () => {
       })
 
       if(!response.ok){
-          throw new Error(data.error || "Error al iniciar sesión")
+          throw new Error("Error al iniciar sesión")
       }
 
       const data = await response.json()

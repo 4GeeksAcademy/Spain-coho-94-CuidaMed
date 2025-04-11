@@ -255,7 +255,7 @@ const HeightRecords = () => {
                     <div className="card me-2 h-100">
                         <h5 className="card-header bg-primary text-white">Historial de registros</h5>
                         {error.list && (
-                            <div className="alert alert-danger mb-4" role="alert">
+                            <div className="alert alert-danger m-2" role="alert">
                                 {error.list}
                             </div>
                         )}

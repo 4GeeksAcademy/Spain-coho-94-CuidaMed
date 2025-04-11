@@ -124,7 +124,6 @@ const GlucoseRecords = () => {
 
         try {
             const formattedDate = formatDatetime(formData.measurementDate);
-            const formattedForm = {...formData, measurementDate: formattedDate}
             const response = await fetch(`${backendUrl}/api/records/glucose` ,{
                 method: "POST",
                 headers: {
@@ -253,7 +252,7 @@ const GlucoseRecords = () => {
                     <div className="card me-2 h-100">
                         <h5 className="card-header bg-primary text-white">Historial de registros</h5>
                         {error.list && (
-                            <div className="alert alert-danger mb-4" role="alert">
+                            <div className="alert alert-danger m-2" role="alert">
                                 {error.list}
                             </div>
                         )}

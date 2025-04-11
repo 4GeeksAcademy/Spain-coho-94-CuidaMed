@@ -6,39 +6,11 @@ const WeightRecords = () => {
     const { store, dispatch } = useGlobalReducer();
     const [formData, setFormData] = useState({
         weightValue: undefined,
-        measurementDate: undefined, //aqui pondremos la fecha y hora según base de datos
+        measurementDate: undefined, 
         comments: ""
     }
     )
-    const [weightHistory, setWeightHistory] = useState([
-
-        { id: 1, weightValue: 72.5, measurementDate: "2025-03-01T08:00", comments: "En ayunas" },
-        { id: 2, weightValue: 73.0, measurementDate: "2025-03-02T08:10", comments: "Después de cenar" },
-        { id: 3, weightValue: 72.2, measurementDate: "2025-03-03T08:05", comments: "En ayunas" },
-        { id: 4, weightValue: 72.7, measurementDate: "2025-03-04T08:15", comments: "Después del desayuno" },
-        { id: 5, weightValue: 72.3, measurementDate: "2025-03-05T07:50", comments: "Recién levantado" },
-        { id: 6, weightValue: 73.1, measurementDate: "2025-03-06T08:20", comments: "Después del almuerzo" },
-        { id: 7, weightValue: 72.0, measurementDate: "2025-03-07T08:00", comments: "En ayunas" },
-        { id: 8, weightValue: 72.8, measurementDate: "2025-03-08T08:10", comments: "Después de cenar" },
-        { id: 9, weightValue: 72.4, measurementDate: "2025-03-09T08:00", comments: "En ayunas" },
-        { id: 10, weightValue: 73.2, measurementDate: "2025-03-10T08:30", comments: "Después del desayuno" },
-        { id: 11, weightValue: 72.6, measurementDate: "2025-03-11T08:10", comments: "Antes de comer" },
-        { id: 12, weightValue: 73.0, measurementDate: "2025-03-12T08:15", comments: "Después de merienda" },
-        { id: 13, weightValue: 72.1, measurementDate: "2025-03-13T08:00", comments: "En ayunas" },
-        { id: 14, weightValue: 72.9, measurementDate: "2025-03-14T08:20", comments: "Después de caminar" },
-        { id: 15, weightValue: 72.3, measurementDate: "2025-03-15T08:05", comments: "Antes del desayuno" },
-        { id: 16, weightValue: 73.3, measurementDate: "2025-03-16T08:00", comments: "Después de cenar" },
-        { id: 17, weightValue: 72.2, measurementDate: "2025-03-17T08:10", comments: "En reposo" },
-        { id: 18, weightValue: 72.7, measurementDate: "2025-03-18T08:00", comments: "Recién levantado" },
-        { id: 19, weightValue: 72.0, measurementDate: "2025-03-19T08:15", comments: "En ayunas" },
-        { id: 20, weightValue: 73.1, measurementDate: "2025-03-20T08:30", comments: "Después del desayuno" },
-        { id: 21, weightValue: 72.4, measurementDate: "2025-03-21T08:00", comments: "Mañana normal" },
-        { id: 22, weightValue: 73.0, measurementDate: "2025-03-22T08:25", comments: "Después de comer" },
-        { id: 23, weightValue: 72.5, measurementDate: "2025-03-23T08:00", comments: "En ayunas" },
-        { id: 24, weightValue: 72.8, measurementDate: "2025-03-24T08:10", comments: "Día soleado" },
-        { id: 25, weightValue: 72.2, measurementDate: "2025-03-25T08:00", comments: "Sin variaciones" },
-
-    ])
+    const [weightHistory, setWeightHistory] = useState([])
     const [sortedHistory, setSortedHistory] = useState([]);
     const [error, setError] = useState({
         form: "",
@@ -50,18 +22,18 @@ const WeightRecords = () => {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const accessToken = localStorage.getItem("accessToken");
 
     useEffect(() => {
         const fetchRecordData = async () => {
             try {
                 
-                const response = await fetch(/* URL*/"",
+                const response = await fetch(`${backendUrl}/api/records/weight`,
                     {
                         method: 'GET',
                         headers: {
                             "Content-Type": "application/json",
-                            // Enviamos el token a BD en el header.
-                            "Authorization": `Bearer ${store.token}`
+                            "Authorization": `Bearer ${accessToken}`
                         }
                     });
                 const data = await response.json();
@@ -70,12 +42,20 @@ const WeightRecords = () => {
                     throw new Error(data.error || "Error al obtener el historial de registros")
                 }
 
-                setWeightHistory(/* data.loquesea */)
+                setWeightHistory(data.map(item => 
+                    ({
+                        recordId:item.id,
+                        weightValue:item.weight,
+                        measurementDate: item.manual_datetime, 
+                        comments:item.comments
+                    })
+                ));
 
             } catch (error) {
-                setError(...error, { list: error.message })
+                setError({...error, list: error.message })
             }
         }
+        fetchRecordData();
     }, [])
     useEffect(() => {
             if (weightHistory) {
@@ -127,7 +107,16 @@ const WeightRecords = () => {
             }))
         }
     }
-
+    const formatDatetime = (datetimeStr) => {
+        const dateObj = new Date(datetimeStr);
+        const day = String(dateObj.getDate()).padStart(2, "0");
+        const month = String(dateObj.getMonth() + 1).padStart(2, "0"); // enero = 0
+        const year = dateObj.getFullYear();
+        const hours = String(dateObj.getHours()).padStart(2, "0");
+        const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+      
+        return `${day}-${month}-${year} ${hours}:${minutes}`;
+    }
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) {
@@ -136,15 +125,18 @@ const WeightRecords = () => {
         setLoading(true);
 
         try {
-            
-            /*const response = await fetch(""/*URL backend, {
+            const formattedDate = formatDatetime(formData.measurementDate);
+            const response = await fetch(`${backendUrl}/api/records/weight`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // Enviamos el token a BD en el header.
-                    "Authorization": `Bearer ${store.token}`
+                    "Authorization": `Bearer ${accessToken}`
                 },
-                body: JSON.stringify(formData) //Aqui tenemos que mapear los campos del backend y frontend
+                body: JSON.stringify({
+                    weight:formData.weightValue,
+                    manual_datetime:formattedDate,
+                    comments:formData.comments 
+                }) 
             })
 
             const data = await response.json();
@@ -152,13 +144,23 @@ const WeightRecords = () => {
             if (!response.ok) {
                 throw new Error(data.error || "Error al crear el registro");
             }
-            */
-            setWeightHistory([formData, ...weightHistory]) //Actualizamos el estado pero hace falta el mapeo
+            
+            setWeightHistory([{
+                weightValue:data.weight,
+                measurementDate:data.manual_datetime,
+                comments:data.comments,
+                recordId:data.id,
+            }, ...weightHistory]) 
 
         } catch (error) {
             setError(error.data)
         } finally {
             setLoading(false)
+            setFormData({
+                weightValue:"",
+                measurementDate: "",
+                comments: ""
+            })
         }
     }
 
@@ -168,21 +170,21 @@ const WeightRecords = () => {
 
     const handleDelete = async (recordId) => {
         try {
-            /*const response = await fetch(/* backend_url con el id del record"",
+            const response = await fetch( `${backendUrl}/api/records/weight/${recordId}`,
                 {
                     method: 'DELETE',
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${store.token}`
+                        "Authorization": `Bearer ${accessToken}`
                     }
                 }
             )
             if (!response.ok) throw new Error("Error al eliminar el registro");
-            */
-            setWeightHistory(weightHistory.filter((record)=> record.id !== recordId ))
+            
+            setWeightHistory(weightHistory.filter((record)=> record.recordId !== recordId ))
             
         } catch (error) {
-            setError(...error,{ list: error.message })
+            setError({...error, list: error.message })
         }
 
     }
@@ -252,7 +254,7 @@ const WeightRecords = () => {
                     <div className="card me-2 h-100">
                         <h5 className="card-header bg-primary text-white">Historial de registros</h5>
                         {error.list && (
-                            <div className="alert alert-danger mb-4" role="alert">
+                            <div className="alert alert-danger m-2" role="alert">
                                 {error.list}
                             </div>
                         )}
@@ -267,11 +269,11 @@ const WeightRecords = () => {
                                 <tbody>
                                     {sortedHistory && sortedHistory.slice((currentPage - 1) * 7, currentPage * 7).map((data) => {
                                         return (
-                                            <tr key={data.id}>
+                                            <tr key={data.recordId}>
                                                 <td >{data.weightValue}</td>
                                                 <td >{data.measurementDate}</td>
                                                 <td >{data.comments}</td>
-                                                <td><button className="btn" onClick={()=>handleDelete(data.id)}><i className="text-danger fa-solid fa-trash"></i></button></td>
+                                                <td><button className="btn" onClick={()=>handleDelete(data.recordId)}><i className="text-danger fa-solid fa-trash"></i></button></td>
                                             </tr>
                                         )
                                     })}
