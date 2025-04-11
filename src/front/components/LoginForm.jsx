@@ -127,7 +127,7 @@ const LoginForm = () => {
                   className={`form-control ${errors.password ? 'is-invalid' : ''}`}
                   id="password"
                   name="password"
-                  placeholder="Crea una contraseña"
+                  placeholder="Introduce tu contraseña"
                   value={formData.password}
                   onChange={handleChange}
                   />
