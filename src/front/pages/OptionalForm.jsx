@@ -9,32 +9,32 @@ const totalSteps = 3;
 
 const sexOptions = [
   { value: "", label: "Selecciona una opción" },
-  { value: "F", label: "Femenino" },
-  { value: "M", label: "Masculino" },
-  { value: "NB", label: "No Binario" },
-  { value: "O", label: "Otro" },
-  { value: "NS/NC", label: "Prefiero no decirlo" }
+  { value: "GENDER_FEMALE", label: "Femenino" },
+  { value: "GENDER_MALE", label: "Masculino" },
+  { value: "GENDER_NONBINARY", label: "No Binario" },
+  { value: "GENDER_OTHER", label: "Otro" },
+  { value: "GENDER_NONE", label: "Prefiero no decirlo" }
 ];
 
 const bloodTypeOptions = [
   { value: "", label: "Selecciona una opción" },
-  { value: "A+", label: "A+" },
-  { value: "A-", label: "A-" },
-  { value: "B+", label: "B+" },
-  { value: "B-", label: "B-" },
-  { value: "AB+", label: "AB+" },
-  { value: "AB-", label: "AB-" },
-  { value: "O+", label: "O+" },
-  { value: "O-", label: "O-" }
+  { value: "BLOOD_A_POSITIVE", label: "A+" },
+  { value: "BLOOD_A_NEGATIVE", label: "A-" },
+  { value: "BLOOD_B_POSITIVE", label: "B+" },
+  { value: "BLOOD_B_NEGATIVE", label: "B-" },
+  { value: "BLOOD_AB_POSITIVE", label: "AB+" },
+  { value: "BLOOD_AB_NEGATIVE", label: "AB-" },
+  { value: "BLOOD_O_POSITIVE", label: "O+" },
+  { value: "BLOOD_O_NEGATIVE", label: "O-" }
 ];
 
 const physicalActivityOptions = [
   { value: "", label: "Selecciona una opción" },
-  { value: "sedentary", label: "Sedentario" },
-  { value: "light", label: "Leve" },
-  { value: "moderate", label: "Moderado" },
-  { value: "intense", label: "Intenso" },
-  { value: "athlete", label: "Atleta" },
+  { value: "ACTIVITY_SEDENTARY", label: "Sedentario" },
+  { value: "ACTIVITY_LIGHT", label: "Leve" },
+  { value: "ACTIVITY_MODERATE", label: "Moderado" },
+  { value: "ACTIVITY_INTENSE", label: "Intenso" },
+  { value: "ACTIVITY_ATHLETE", label: "Atleta" },
 ]
 
 function OptionalForm() {
@@ -232,14 +232,29 @@ function OptionalForm() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('URL', {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+
+      const formattedData = {
+        name: formData.name,
+        birth_date: formData.birthDate,
+        phone: formData.phone,
+        gender: formData.sex,
+        last_weight: formData.weight ? parseFloat(formData.weight.replace(',', '.')) : null,
+        last_height: formData.height ? parseFloat(formData.height.replace(',', '.')) : null,
+        BMI: imc ? parseFloat(imc) : null,
+        blood_type: formData.bloodType || null,
+        dietary_preferences: formData.dietaryPreference || null,
+        physical_activity: formData.physicalActivity || null
+      };
+
+      const response = await fetch(`${backendUrl}/api/users/general-data`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${store.token}`
         },
 
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formattedData),
       });
 
       if (!response.ok) {
@@ -269,7 +284,7 @@ function OptionalForm() {
         setAge(null);
         setImc(null)
       }, 3000)
-
+      
 
     } catch (error) {
       console.error('Error:', error);
@@ -278,7 +293,7 @@ function OptionalForm() {
     } finally {
       setIsSubmitting(false)
     }
-  }
+  };
 
   function renderSteps() {
     switch (step) {
