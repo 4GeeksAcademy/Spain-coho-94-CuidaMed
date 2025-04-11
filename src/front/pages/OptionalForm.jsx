@@ -233,9 +233,10 @@ function OptionalForm() {
 
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+      const accessToken = localStorage.getItem("accessToken");
 
       const formattedData = {
-        name: formData.name,
+        name: formData.userName,
         birth_date: formData.birthDate,
         phone: formData.phone,
         gender: formData.sex,
@@ -251,7 +252,7 @@ function OptionalForm() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${store.token}`
+          'Authorization': `Bearer ${accessToken}`
         },
 
         body: JSON.stringify(formattedData),
