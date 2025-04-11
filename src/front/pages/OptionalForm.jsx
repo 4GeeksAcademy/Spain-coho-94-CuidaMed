@@ -54,6 +54,7 @@ function OptionalForm() {
   const [errors, setErrors] = useState({});
   const [age, setAge] = useState(null)
   const [imc, setImc] = useState(null)
+  const [redirectTimer, setRedirectTimer] = useState(null);
 
   //Construyo estados para los modales
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -181,7 +182,7 @@ function OptionalForm() {
         break;
       case 2:
         if (formData.height) {
-          const heightValue = parseFloat(formData.height.toString().replace(',','.'));//Me aseguro de las comas se transformen en punto para el parseFloat
+          const heightValue = parseFloat(formData.height.toString().replace(',', '.'));//Me aseguro de las comas se transformen en punto para el parseFloat
 
           if (isNaN(heightValue) || heightValue <= 0 || heightValue > 3) {
             newErrors.height = "Ingresa una altura válida (entre 0 y 3 metros)";
@@ -190,7 +191,7 @@ function OptionalForm() {
 
         if (formData.weight) {
           const weightValue = parseFloat(formData.weight.toString().replace(',', '.'));
-          
+
           if (isNaN(weightValue) || weightValue <= 0 || weightValue > 500) {
             newErrors.weight = "Ingresa un peso válido (entre 0 y 500 kg)";
           }
@@ -267,25 +268,11 @@ function OptionalForm() {
 
       setShowSuccessModal(true);
 
-      setTimeout(() => {
-        setShowSuccessModal(false);
-        setStep(1);
-        setErrors({});
-        setFormData({
-          userName: "",
-          phone: "",
-          birthDate: "",
-          sex: "",
-          height: "",
-          weight: "",
-          bloodType: "",
-          dietaryPreference: "",
-          physicalActivity: "",
-        });
-        setAge(null);
-        setImc(null)
-      }, 3000)
-      
+      const redirectTimer = setTimeout(() => {
+        redirectToUserPage();
+      }, 5000);
+
+      setRedirectTimer(redirectTimer);
 
     } catch (error) {
       console.error('Error:', error);
@@ -295,6 +282,31 @@ function OptionalForm() {
       setIsSubmitting(false)
     }
   };
+
+  function redirectToUserPage() {
+    if (redirectTimer) {
+      clearTimeout(redirectTimer);
+    }
+
+    setShowSuccessModal(false);
+    setStep(1);
+    setErrors({});
+    setFormData({
+      userName: "",
+      phone: "",
+      birthDate: "",
+      sex: "",
+      height: "",
+      weight: "",
+      bloodType: "",
+      dietaryPreference: "",
+      physicalActivity: "",
+    });
+    setAge(null);
+    setImc(null);
+
+    //Aquí debería ir el navigate
+  }
 
   function renderSteps() {
     switch (step) {
@@ -607,6 +619,7 @@ function OptionalForm() {
         showSuccessModal={showSuccessModal}
         modalTitle={"¡Formulario enviado con éxito!"}
         text={"Tus datos han sido registrados correctamente."}
+        onRedirect={redirectToUserPage}
       />
       <ErrorModal
         showErrorModal={showErrorModal}
