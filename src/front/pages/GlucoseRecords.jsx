@@ -10,35 +10,7 @@ const GlucoseRecords = () => {
         comments: ""
     }
     )
-    const [glucoseHistory, setGlucoseHistory] = useState([
-
-        { id: 1, glucoseValue: 98, measurementDate: "2025-03-10T08:30", comments: "Antes del desayuno" },
-        { id: 2, glucoseValue: 112, measurementDate: "2025-03-10T13:15", comments: "Después de comer" },
-        { id: 3, glucoseValue: 94, measurementDate: "2025-03-11T07:45", comments: "En ayunas" },
-        { id: 4, glucoseValue: 135, measurementDate: "2025-03-11T19:45", comments: "Después de cenar" },
-        { id: 5, glucoseValue: 87, measurementDate: "2025-03-12T08:10", comments: "Antes del desayuno" },
-        { id: 6, glucoseValue: 128, measurementDate: "2025-03-12T14:00", comments: "Después de comer" },
-        { id: 7, glucoseValue: 91, measurementDate: "2025-03-13T08:20", comments: "En ayunas" },
-        { id: 8, glucoseValue: 118, measurementDate: "2025-03-13T20:30", comments: "Después de cenar" },
-        { id: 9, glucoseValue: 104, measurementDate: "2025-03-14T07:50", comments: "Antes del desayuno" },
-        { id: 10, glucoseValue: 123, measurementDate: "2025-03-14T12:45", comments: "Después de comer" },
-        { id: 11, glucoseValue: 99, measurementDate: "2025-03-15T08:00", comments: "Antes del desayuno" },
-        { id: 12, glucoseValue: 142, measurementDate: "2025-03-15T19:00", comments: "Después de cenar" },
-        { id: 13, glucoseValue: 96, measurementDate: "2025-03-16T08:35", comments: "En ayunas" },
-        { id: 14, glucoseValue: 133, measurementDate: "2025-03-16T14:10", comments: "Después de comer" },
-        { id: 15, glucoseValue: 89, measurementDate: "2025-03-17T08:25", comments: "Antes del desayuno" },
-        { id: 16, glucoseValue: 120, measurementDate: "2025-03-17T20:00", comments: "Después de cenar" },
-        { id: 17, glucoseValue: 101, measurementDate: "2025-03-18T07:40", comments: "En ayunas" },
-        { id: 18, glucoseValue: 127, measurementDate: "2025-03-18T13:50", comments: "Después de comer" },
-        { id: 19, glucoseValue: 92, measurementDate: "2025-03-19T08:00", comments: "Antes del desayuno" },
-        { id: 20, glucoseValue: 136, measurementDate: "2025-03-19T19:30", comments: "Después de cenar" },
-        { id: 21, glucoseValue: 85, measurementDate: "2025-03-20T07:30", comments: "En ayunas" },
-        { id: 22, glucoseValue: 110, measurementDate: "2025-03-20T13:20", comments: "Después de comer" },
-        { id: 23, glucoseValue: 97, measurementDate: "2025-03-21T08:10", comments: "Antes del desayuno" },
-        { id: 24, glucoseValue: 119, measurementDate: "2025-03-21T19:20", comments: "Después de cenar" },
-        { id: 25, glucoseValue: 102, measurementDate: "2025-03-22T08:00", comments: "Antes del desayuno" },
-
-    ])
+    const [glucoseHistory, setGlucoseHistory] = useState([])
     const [sortedHistory, setSortedHistory] = useState([]);
     const [error, setError] = useState({
         form: "",
@@ -50,32 +22,37 @@ const GlucoseRecords = () => {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const accessToken = localStorage.getItem("accessToken");
 
     useEffect(() => {
         const fetchRecordData = async () => {
             try {
-                
-                const response = await fetch(/* URL*/"",
+                const response = await fetch(`${backendUrl}/api/records/glucose`,
                     {
                         method: 'GET',
                         headers: {
                             "Content-Type": "application/json",
-                            // Enviamos el token a BD en el header.
-                            "Authorization": `Bearer ${store.token}`
+                            "Authorization": `Bearer ${accessToken}`
                         }
                     });
                 const data = await response.json();
 
                 if (!response.ok) {
                     throw new Error(data.error || "Error al obtener el historial de registros")
-                }
+                };
 
-                setGlucoseHistory(/* data.loquesea */)
-
+                setGlucoseHistory(data.map(item => 
+                    ({
+                        glucoseValue:item.glucose,
+                        measurementDate: item.manual_datetime, 
+                        comments:item.comments
+                    })
+                ));
             } catch (error) {
-                setError(...error, { list: error.message })
+                setError({...error,  list: error.message })
             }
         }
+        fetchRecordData();
     }, [])
     useEffect(() => {
             if (glucoseHistory) {
@@ -137,7 +114,7 @@ const GlucoseRecords = () => {
 
         try {
             
-            /*const response = await fetch(""/*URL backend, {
+            /*const response = await fetch(`${backendUrl}/api/records/glucose` {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -168,17 +145,17 @@ const GlucoseRecords = () => {
 
     const handleDelete = async (recordId) => {
         try {
-            /*const response = await fetch(/* backend_url con el id del record"",
+            const response = await fetch(`${backendUrl}/api/records/glucose`,
                 {
                     method: 'DELETE',
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${store.token}`
+                        "Authorization": `Bearer ${accessToken}`
                     }
                 }
             )
             if (!response.ok) throw new Error("Error al eliminar el registro");
-            */
+            
             setGlucoseHistory(glucoseHistory.filter((record)=> record.id !== recordId ))
             
         } catch (error) {
