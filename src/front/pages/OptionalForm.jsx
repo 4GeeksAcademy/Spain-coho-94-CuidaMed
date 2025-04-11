@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
 import ProgressBar from "../components/ProgressBar";
-import useGlobalReducer from "../hooks/useGlobalReducer";
+import { useNavigate} from "react-router-dom"
 
 const totalSteps = 3;
 
@@ -38,7 +38,7 @@ const physicalActivityOptions = [
 ]
 
 function OptionalForm() {
-  const { store, dispatch } = useGlobalReducer();
+  
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     userName: "",
@@ -55,12 +55,15 @@ function OptionalForm() {
   const [age, setAge] = useState(null)
   const [imc, setImc] = useState(null)
   const [redirectTimer, setRedirectTimer] = useState(null);
+  const navigate = useNavigate();
 
   //Construyo estados para los modales
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  
 
   useEffect(() => {
     if (formData.birthDate) {
@@ -287,6 +290,7 @@ function OptionalForm() {
     if (redirectTimer) {
       clearTimeout(redirectTimer);
     }
+    
 
     setShowSuccessModal(false);
     setStep(1);
@@ -305,7 +309,7 @@ function OptionalForm() {
     setAge(null);
     setImc(null);
 
-    //Aquí debería ir el navigate
+    navigate('/dashboard') 
   }
 
   function renderSteps() {
