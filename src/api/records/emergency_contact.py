@@ -88,6 +88,37 @@ def get_emergency_contact():
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+# Visto que por ahora se va a manejar un solo contacto de emergencia por usuario, 
+# no esta especificado el id del contacto de emergencia(porqué solo existirá 1)
+@emergency_contact_blueprint.route('/', methods=['DELETE'])
+@jwt_required()
+def delete_emergency_contact():
+    try:
+        # Obtener el ID del usuario actual
+        current_user_id = get_jwt_identity()
+        
+        # Verificar si el usuario existe
+        user = User.query.get(current_user_id)
+        if not user:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+        
+        # Buscar el contacto de emergencia del usuario
+        contact = EmergencyContact.query.filter_by(user_id=current_user_id).first()
+        
+        if not contact:
+            return jsonify({"message": "No se encontró contacto de emergencia para este usuario"}), 404
+        
+        # Eliminar el contacto
+        db.session.delete(contact)
+        db.session.commit()
+        
+        return jsonify({"message": "Contacto de emergencia eliminado exitosamente"}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
 
 
 
