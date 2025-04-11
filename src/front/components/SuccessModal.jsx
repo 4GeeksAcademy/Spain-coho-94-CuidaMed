@@ -17,6 +17,15 @@ const SuccessModal = (props) => {
               </div>
               <p className="mb-0">{props.text}</p>
             </div>
+            <div className="modal-footer justify-content-center">
+              <button
+              type="button" 
+              className="btn btn-primary"
+              onClick={props.onRedirect}
+              >
+                Ir a mi perfil CuidaMed
+              </button>
+            </div>
           </div>
         </div>
       </div>

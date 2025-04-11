@@ -129,6 +129,7 @@ def add_general_data():
     try:
         current_user_id = get_jwt_identity()
         data = request.get_json()
+        print("Datos recibidos:", data)
 
         # Verificar que se proporcionen los datos necesarios
         # Estos datos los debe ingresar el Usuario, son requeridos(Obligatorios)
@@ -142,7 +143,7 @@ def add_general_data():
             # Puede ser que el usuario ingresa la fecha en formato DD-MM-YYYY o DD-MM-YY
             birth_date_str = data['birth_date']
             # Varios formatos comunes
-            for fmt in ['%d-%m-%Y', '%d-%m-%y', '%d/%m/%Y', '%d/%m/%y']:
+            for fmt in ['%d-%m-%Y', '%d-%m-%y', '%d/%m/%Y', '%d/%m/%y', '%Y-%m-%d']:
                 try:
                     birth_date = datetime.strptime(birth_date_str, fmt)
                     # Pasa al formato deseado DD-MM-YY
@@ -166,7 +167,7 @@ def add_general_data():
         general_data = GeneralData(
             user_id=current_user_id,
             name=data['name'],
-            birth_date=formatted_birth_date,  # Usamos la fecha formateada
+            birth_date=data['birth_date'],  # Usamos la fecha formateada
             phone=data['phone'],
             gender=Gender[data['gender']] if data['gender'] in [
                 g.name for g in Gender] else None

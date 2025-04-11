@@ -3,42 +3,42 @@ import { useState, useEffect } from "react";
 import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
 import ProgressBar from "../components/ProgressBar";
-import useGlobalReducer from "../hooks/useGlobalReducer";
+import { useNavigate} from "react-router-dom"
 
 const totalSteps = 3;
 
 const sexOptions = [
   { value: "", label: "Selecciona una opción" },
-  { value: "F", label: "Femenino" },
-  { value: "M", label: "Masculino" },
-  { value: "NB", label: "No Binario" },
-  { value: "O", label: "Otro" },
-  { value: "NS/NC", label: "Prefiero no decirlo" }
+  { value: "GENDER_FEMALE", label: "Femenino" },
+  { value: "GENDER_MALE", label: "Masculino" },
+  { value: "GENDER_NONBINARY", label: "No Binario" },
+  { value: "GENDER_OTHER", label: "Otro" },
+  { value: "GENDER_NONE", label: "Prefiero no decirlo" }
 ];
 
 const bloodTypeOptions = [
   { value: "", label: "Selecciona una opción" },
-  { value: "A+", label: "A+" },
-  { value: "A-", label: "A-" },
-  { value: "B+", label: "B+" },
-  { value: "B-", label: "B-" },
-  { value: "AB+", label: "AB+" },
-  { value: "AB-", label: "AB-" },
-  { value: "O+", label: "O+" },
-  { value: "O-", label: "O-" }
+  { value: "BLOOD_A_POSITIVE", label: "A+" },
+  { value: "BLOOD_A_NEGATIVE", label: "A-" },
+  { value: "BLOOD_B_POSITIVE", label: "B+" },
+  { value: "BLOOD_B_NEGATIVE", label: "B-" },
+  { value: "BLOOD_AB_POSITIVE", label: "AB+" },
+  { value: "BLOOD_AB_NEGATIVE", label: "AB-" },
+  { value: "BLOOD_O_POSITIVE", label: "O+" },
+  { value: "BLOOD_O_NEGATIVE", label: "O-" }
 ];
 
 const physicalActivityOptions = [
   { value: "", label: "Selecciona una opción" },
-  { value: "sedentary", label: "Sedentario" },
-  { value: "light", label: "Leve" },
-  { value: "moderate", label: "Moderado" },
-  { value: "intense", label: "Intenso" },
-  { value: "athlete", label: "Atleta" },
+  { value: "ACTIVITY_SEDENTARY", label: "Sedentario" },
+  { value: "ACTIVITY_LIGHT", label: "Leve" },
+  { value: "ACTIVITY_MODERATE", label: "Moderado" },
+  { value: "ACTIVITY_INTENSE", label: "Intenso" },
+  { value: "ACTIVITY_ATHLETE", label: "Atleta" },
 ]
 
 function OptionalForm() {
-  const { store, dispatch } = useGlobalReducer();
+  
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     userName: "",
@@ -54,12 +54,16 @@ function OptionalForm() {
   const [errors, setErrors] = useState({});
   const [age, setAge] = useState(null)
   const [imc, setImc] = useState(null)
+  const [redirectTimer, setRedirectTimer] = useState(null);
+  const navigate = useNavigate();
 
   //Construyo estados para los modales
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  
 
   useEffect(() => {
     if (formData.birthDate) {
@@ -181,7 +185,7 @@ function OptionalForm() {
         break;
       case 2:
         if (formData.height) {
-          const heightValue = parseFloat(formData.height.toString().replace(',','.'));//Me aseguro de las comas se transformen en punto para el parseFloat
+          const heightValue = parseFloat(formData.height.toString().replace(',', '.'));//Me aseguro de las comas se transformen en punto para el parseFloat
 
           if (isNaN(heightValue) || heightValue <= 0 || heightValue > 3) {
             newErrors.height = "Ingresa una altura válida (entre 0 y 3 metros)";
@@ -190,7 +194,7 @@ function OptionalForm() {
 
         if (formData.weight) {
           const weightValue = parseFloat(formData.weight.toString().replace(',', '.'));
-          
+
           if (isNaN(weightValue) || weightValue <= 0 || weightValue > 500) {
             newErrors.weight = "Ingresa un peso válido (entre 0 y 500 kg)";
           }
@@ -232,14 +236,30 @@ function OptionalForm() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('URL', {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+      const accessToken = localStorage.getItem("accessToken");
+
+      const formattedData = {
+        name: formData.userName,
+        birth_date: formData.birthDate,
+        phone: formData.phone,
+        gender: formData.sex,
+        last_weight: formData.weight ? parseFloat(formData.weight.replace(',', '.')) : null,
+        last_height: formData.height ? parseFloat(formData.height.replace(',', '.')) : null,
+        BMI: imc ? parseFloat(imc) : null,
+        blood_type: formData.bloodType || null,
+        dietary_preferences: formData.dietaryPreference || null,
+        physical_activity: formData.physicalActivity || null
+      };
+
+      const response = await fetch(`${backendUrl}/api/users/general-data`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${store.token}`
+          'Authorization': `Bearer ${accessToken}`
         },
 
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formattedData),
       });
 
       if (!response.ok) {
@@ -251,25 +271,11 @@ function OptionalForm() {
 
       setShowSuccessModal(true);
 
-      setTimeout(() => {
-        setShowSuccessModal(false);
-        setStep(1);
-        setErrors({});
-        setFormData({
-          userName: "",
-          phone: "",
-          birthDate: "",
-          sex: "",
-          height: "",
-          weight: "",
-          bloodType: "",
-          dietaryPreference: "",
-          physicalActivity: "",
-        });
-        setAge(null);
-        setImc(null)
-      }, 3000)
+      const redirectTimer = setTimeout(() => {
+        redirectToUserPage();
+      }, 5000);
 
+      setRedirectTimer(redirectTimer);
 
     } catch (error) {
       console.error('Error:', error);
@@ -278,6 +284,32 @@ function OptionalForm() {
     } finally {
       setIsSubmitting(false)
     }
+  };
+
+  function redirectToUserPage() {
+    if (redirectTimer) {
+      clearTimeout(redirectTimer);
+    }
+    
+
+    setShowSuccessModal(false);
+    setStep(1);
+    setErrors({});
+    setFormData({
+      userName: "",
+      phone: "",
+      birthDate: "",
+      sex: "",
+      height: "",
+      weight: "",
+      bloodType: "",
+      dietaryPreference: "",
+      physicalActivity: "",
+    });
+    setAge(null);
+    setImc(null);
+
+    navigate('/dashboard') 
   }
 
   function renderSteps() {
@@ -591,6 +623,7 @@ function OptionalForm() {
         showSuccessModal={showSuccessModal}
         modalTitle={"¡Formulario enviado con éxito!"}
         text={"Tus datos han sido registrados correctamente."}
+        onRedirect={redirectToUserPage}
       />
       <ErrorModal
         showErrorModal={showErrorModal}
