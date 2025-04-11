@@ -44,3 +44,27 @@ def create_medication():
     db.session.commit()
     
     return jsonify(new_medication.serialize_medication()), 201
+
+
+@medications_blueprint.route('/', methods=['GET'])
+@jwt_required()
+def get_medications():
+    current_user_id = get_jwt_identity()
+    
+    try:
+        # Buscar todos los medicamentos del usuario ordenados por fecha de registro (más recientes primero)
+        user_medications = Medication.query.filter_by(user_id=current_user_id).order_by(Medication.registration_date.desc()).all()
+        
+        # Serializar los resultados
+        medications_list = [medication.serialize_medication() for medication in user_medications]
+        
+        # Construir respuesta
+        response = {
+            "data": medications_list,
+            "medications_empty": len(medications_list) == 0
+        }
+        
+        return jsonify(response), 200
+    
+    except Exception as e:
+        return jsonify({"msg": "Error al obtener los tratamientos", "error": str(e)}), 500
