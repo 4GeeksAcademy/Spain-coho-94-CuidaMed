@@ -3,11 +3,102 @@ En este archivo están todas las rutas de Datos Generales
 Ruta /api/users/general-data
 """
 from flask import request, jsonify, Blueprint
-from api.models import db, GeneralData, Gender, BloodType, PhysicalActivity
+from api.models import db, User, GeneralData, Gender, BloodType, PhysicalActivity, BloodPressure, Glucose, Weight, Medication, EmergencyContact
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy import or_
 from datetime import datetime
 
 users_bp = Blueprint('users', __name__)
+
+
+@users_bp.route('/dashboard', methods=['GET'])
+@jwt_required()
+def user_dashboard():
+    try:
+        # Obtener ID del usuario actual
+        current_user_id = get_jwt_identity()
+        
+        # Verificar existencia del usuario
+        user = User.query.get(current_user_id)
+        if not user:
+            return jsonify({'error': 'Usuario no encontrado', 'code': 'USER_NOT_FOUND'}), 404
+
+        # Inicializar valores por defecto
+        response = {
+            'last_blood_pressure': None,
+            'last_glucose': None,
+            'last_weight': None,
+            'last_emergency_contact': None,
+            'current_medication': []
+        }
+        
+        # Obtener última tensión arterial
+        try:
+            last_blood_pressure = BloodPressure.query.filter_by(user_id=current_user_id).order_by(BloodPressure.manual_datetime.desc()).first()
+            response['last_blood_pressure'] = last_blood_pressure.serialize_blood_pressure() if last_blood_pressure else None
+        except Exception as e:
+            # Registrar el error pero continuar con el resto de consultas
+            print(f"Error al obtener la tensión arterial: {str(e)}")
+            # Opcionalmente, podrías agregar un logger más sofisticado aquí
+            
+        # Obtener última glucosa
+        try:
+            last_glucose = Glucose.query.filter_by(user_id=current_user_id).order_by(Glucose.manual_datetime.desc()).first()
+            response['last_glucose'] = last_glucose.serialize_glucose() if last_glucose else None
+        except Exception as e:
+            print(f"Error al obtener la glucosa: {str(e)}")
+            
+        # Obtener último peso
+        try:
+            last_weight = Weight.query.filter_by(user_id=current_user_id).order_by(Weight.manual_datetime.desc()).first()
+            response['last_weight'] = last_weight.serialize_weight() if last_weight else None
+        except Exception as e:
+            print(f"Error al obtener el peso: {str(e)}")
+            
+        # Obtener medicaciones actuales
+        try:
+            last_medication = Medication.query.filter(
+                Medication.user_id == current_user_id,
+                or_(Medication.treatment_end_date > datetime.now(), Medication.treatment_end_date == None)
+            ).order_by(Medication.registration_date.desc()).limit(3).all()
+            response['current_medication'] = [medication.serialize_medication() for medication in last_medication] if last_medication else []
+        except Exception as e:
+            print(f"Error al obtener las medicaciones: {str(e)}")
+            
+        # Obtener contacto de emergencia
+        try:
+            emergency_contact = EmergencyContact.query.filter_by(user_id=current_user_id).first()
+            response['last_emergency_contact'] = emergency_contact.serialize_emergency_contact() if emergency_contact else None
+        except Exception as e:
+            print(f"Error al obtener el contacto de emergencia: {str(e)}")
+            
+        # Verificar si se obtuvo al menos un dato
+        all_empty = (
+            response['last_blood_pressure'] is None and
+            response['last_glucose'] is None and
+            response['last_weight'] is None and
+            response['last_emergency_contact'] is None and
+            len(response['current_medication']) == 0
+        )
+        
+        # Opcionalmente, puedes incluir esta información en la respuesta
+        response['all_empty'] = all_empty
+        
+        return jsonify(response), 200
+        
+    except Exception as e:
+        # Manejo de errores generales
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"Error no capturado en dashboard: {str(e)}\n{error_details}")
+        
+        # En producción, podrías querer ocultar los detalles de error al usuario
+        return jsonify({
+            'error': 'Ha ocurrido un error al obtener los datos del dashboard',
+            'code': 'DASHBOARD_ERROR',
+            # Solo incluir detalles en desarrollo/staging
+            'details': str(e) if app.config.get('DEBUG', False) else None
+        }), 500
 
 
 @users_bp.route('/general-data', methods=['GET'])
