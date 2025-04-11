@@ -33,7 +33,15 @@ def add_bloodpressure_record():
         db.session.add(new_bloodpressure)
         db.session.commit()
 
-        return jsonify({"message": "Registro creado con éxito"}), 201
+        return jsonify({
+            "message": "Registro creado con éxito",
+            "id": new_bloodpressure.id,
+            "systolic": new_bloodpressure.systolic,
+            "diastolic": new_bloodpressure.diastolic,
+            "manual_datetime": new_bloodpressure.manual_datetime.strftime("%d-%m-%Y %H:%M"),
+            "comments": new_bloodpressure.comments
+        
+        }), 201
 
     except Exception as e:
         db.session.rollback()

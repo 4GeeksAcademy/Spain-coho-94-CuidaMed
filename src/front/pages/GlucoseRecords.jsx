@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import useGlobalReducer from "../hooks/useGlobalReducer";
-
 
 const GlucoseRecords = () => {
-    const { store, dispatch } = useGlobalReducer();
+    
     const [formData, setFormData] = useState({
         glucoseValue: undefined,
         measurementDate: undefined, 

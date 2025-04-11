@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import useGlobalReducer from "../hooks/useGlobalReducer";
-
 
 const BloodPressureRecords = () => {
-    const { store, dispatch } = useGlobalReducer();
+    
     const [formData, setFormData] = useState({
         systolicValue: undefined,
         diastolicValue: undefined,
@@ -11,33 +9,7 @@ const BloodPressureRecords = () => {
         comments: ""
     }
     )
-    const [bloodPressureHistory, setBloodPressureHistory] = useState([
-        { id: 1, systolicValue: 120, diastolicValue: 80, measurementDate: "2025-03-01T08:30", comments: "En ayunas" },
-        { id: 2, systolicValue: 130, diastolicValue: 85, measurementDate: "2025-03-01T20:30", comments: "Después de cenar" },
-        { id: 3, systolicValue: 118, diastolicValue: 78, measurementDate: "2025-03-02T08:15", comments: "Antes del desayuno" },
-        { id: 4, systolicValue: 125, diastolicValue: 82, measurementDate: "2025-03-02T13:30", comments: "Después de comer" },
-        { id: 5, systolicValue: 115, diastolicValue: 75, measurementDate: "2025-03-03T08:00", comments: "En reposo" },
-        { id: 6, systolicValue: 138, diastolicValue: 88, measurementDate: "2025-03-03T19:45", comments: "Antes de dormir" },
-        { id: 7, systolicValue: 122, diastolicValue: 79, measurementDate: "2025-03-04T09:00", comments: "Antes del desayuno" },
-        { id: 8, systolicValue: 135, diastolicValue: 85, measurementDate: "2025-03-04T13:00", comments: "Después de caminar" },
-        { id: 9, systolicValue: 119, diastolicValue: 77, measurementDate: "2025-03-05T08:25", comments: "En ayunas" },
-        { id: 10, systolicValue: 126, diastolicValue: 83, measurementDate: "2025-03-05T18:30", comments: "Tarde normal" },
-        { id: 11, systolicValue: 123, diastolicValue: 80, measurementDate: "2025-03-06T07:50", comments: "Después de despertar" },
-        { id: 12, systolicValue: 132, diastolicValue: 87, measurementDate: "2025-03-06T14:20", comments: "Después del almuerzo" },
-        { id: 13, systolicValue: 117, diastolicValue: 74, measurementDate: "2025-03-07T08:10", comments: "En reposo" },
-        { id: 14, systolicValue: 129, diastolicValue: 84, measurementDate: "2025-03-07T21:00", comments: "Antes de dormir" },
-        { id: 15, systolicValue: 121, diastolicValue: 76, measurementDate: "2025-03-08T08:30", comments: "Mañana normal" },
-        { id: 16, systolicValue: 133, diastolicValue: 86, measurementDate: "2025-03-08T13:10", comments: "Después de caminar" },
-        { id: 17, systolicValue: 116, diastolicValue: 73, measurementDate: "2025-03-09T08:00", comments: "En ayunas" },
-        { id: 18, systolicValue: 128, diastolicValue: 81, measurementDate: "2025-03-09T19:00", comments: "Después de cenar" },
-        { id: 19, systolicValue: 124, diastolicValue: 79, measurementDate: "2025-03-10T07:45", comments: "Mañana normal" },
-        { id: 20, systolicValue: 136, diastolicValue: 88, measurementDate: "2025-03-10T14:00", comments: "Después del almuerzo" },
-        { id: 21, systolicValue: 114, diastolicValue: 72, measurementDate: "2025-03-11T08:20", comments: "En reposo" },
-        { id: 22, systolicValue: 127, diastolicValue: 83, measurementDate: "2025-03-11T18:15", comments: "Después de caminar" },
-        { id: 23, systolicValue: 122, diastolicValue: 78, measurementDate: "2025-03-12T09:10", comments: "Antes del desayuno" },
-        { id: 24, systolicValue: 131, diastolicValue: 86, measurementDate: "2025-03-12T13:50", comments: "Después de comer" },
-        { id: 25, systolicValue: 120, diastolicValue: 80, measurementDate: "2025-03-13T08:30", comments: "Mañana estable" },
-    ] )
+    const [bloodPressureHistory, setBloodPressureHistory] = useState([] )
     const [sortedHistory, setSortedHistory] = useState([]);
     const [error, setError] = useState({
         form: "",
@@ -49,18 +21,19 @@ const BloodPressureRecords = () => {
     });
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const accessToken = localStorage.getItem("accessToken");
 
     useEffect(() => {
         const fetchRecordData = async () => {
             try {
-                const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
-                const response = await fetch(/* URL*/"",
+                
+                const response = await fetch(`${backendUrl}/api/records/bloodpressure`,
                     {
                         method: 'GET',
                         headers: {
                             "Content-Type": "application/json",
-                            // Enviamos el token a BD en el header.
-                            "Authorization": `Bearer ${store.token}`
+                            "Authorization": `Bearer ${accessToken}`
                         }
                     });
                 const data = await response.json();
@@ -69,12 +42,21 @@ const BloodPressureRecords = () => {
                     throw new Error(data.error || "Error al obtener el historial de registros")
                 }
 
-                setBloodPressureHistory(/* data.loquesea */)
+                setBloodPressureHistory(data.map(item => 
+                    ({
+                        recordId:item.id,
+                        systolicValue:item.systolic,
+                        diastolicValue: item.diastolic,
+                        measurementDate: item.manual_datetime, 
+                        comments:item.comments
+                    })
+                ));
 
             } catch (error) {
-                setError(...error, { list: error.message })
+                setError({...error,  list: error.message })
             }
         }
+        fetchRecordData();
     }, [])
     useEffect(() => {
         if (bloodPressureHistory) {
@@ -127,6 +109,16 @@ const BloodPressureRecords = () => {
             }))
         }
     }
+    const formatDatetime = (datetimeStr) => {
+        const dateObj = new Date(datetimeStr);
+        const day = String(dateObj.getDate()).padStart(2, "0");
+        const month = String(dateObj.getMonth() + 1).padStart(2, "0"); // enero = 0
+        const year = dateObj.getFullYear();
+        const hours = String(dateObj.getHours()).padStart(2, "0");
+        const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+      
+        return `${day}-${month}-${year} ${hours}:${minutes}`;
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -136,14 +128,20 @@ const BloodPressureRecords = () => {
         setLoading(true);
 
         try {
-            /*const response = await fetch(""/*URL backend, {
+            const formattedDate = formatDatetime(formData.measurementDate);
+            const response = await fetch(`${backendUrl}/api/records/bloodpressure` , {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // Enviamos el token a BD en el header.
-                    "Authorization": `Bearer ${store.token}`
+                    "Authorization": `Bearer ${accessToken}`
                 },
-                body: JSON.stringify(formData) //Aqui tenemos que mapear los campos del backend y frontend
+                body: JSON.stringify({
+                    systolic:formData.systolicValue,
+                    diastolic:formData.diastolicValue,
+                    manual_datetime:formattedDate,
+                    comments:formData.comments                       
+                    
+                })
             })
 
             const data = await response.json();
@@ -151,13 +149,25 @@ const BloodPressureRecords = () => {
             if (!response.ok) {
                 throw new Error(data.error || "Error al crear el registro");
             }
-            */
-            setBloodPressureHistory([formData, ...bloodPressureHistory]) //Actualizamos el estado pero hace falta el mapeo
+            
+            setBloodPressureHistory([{
+                systolicValue:data.systolic,
+                diastolicValue:data.diastolic,
+                measurementDate:data.manual_datetime,
+                comments:data.comments,
+                recordId:data.id,
+            }, ...bloodPressureHistory]) 
 
         } catch (error) {
             setError(error.data)
         } finally {
             setLoading(false)
+            setFormData({
+                systolicValue:"",
+                diastolicValue:"",
+                measurementDate: "",
+                comments: ""
+            })
         }
     }
 
@@ -167,21 +177,21 @@ const BloodPressureRecords = () => {
     const handleDelete = async (recordId) => {
 
         try {
-            /*const response = await fetch(/* backend_url con el id del record"",
+            const response = await fetch( `${backendUrl}/api/records/bloodpressure/${recordId}`,
                 {
                     method: 'DELETE',
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${store.token}`
+                        "Authorization": `Bearer ${accessToken}`
                     }
                 }
             )
             if (!response.ok) throw new Error("Error al eliminar el registro");
-            */
-            setBloodPressureHistory(bloodPressureHistory.filter((record)=> record.id !== recordId ))
+            
+            setBloodPressureHistory(bloodPressureHistory.filter((record)=> record.recordId !== recordId ))
             
         } catch (error) {
-            setError(...error,{ list: error.message })
+            setError({...error, list: error.message })
         }
 
     }
@@ -269,7 +279,7 @@ const BloodPressureRecords = () => {
                     <div className="card me-2 h-100">
                         <h5 className="card-header bg-primary text-white">Historial de registros</h5>
                         {error.list && (
-                            <div className="alert alert-danger mb-4" role="alert">
+                            <div className="alert alert-danger m-2" role="alert">
                                 {error.list}
                             </div>
                         )}
@@ -284,12 +294,12 @@ const BloodPressureRecords = () => {
                                 <tbody>
                                     {sortedHistory && sortedHistory.slice((currentPage - 1) * 7, currentPage * 7).map((data) => {
                                         return (
-                                            <tr key={data.id}>
+                                            <tr key={data.recordId}>
                                                 <td >{data.systolicValue}</td>
                                                 <td >{data.diastolicValue}</td>
                                                 <td >{data.measurementDate}</td>
                                                 <td >{data.comments}</td>
-                                                <td><button className="btn" onClick={()=>handleDelete(data.id)}><i className="text-danger fa-solid fa-trash"></i></button></td>
+                                                <td><button className="btn" onClick={()=>handleDelete(data.recordId)}><i className="text-danger fa-solid fa-trash"></i></button></td>
                                             </tr>
                                         )
                                     })}
