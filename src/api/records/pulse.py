@@ -1,6 +1,7 @@
 """
 En este archivo están todas las rutas relacionadas con la mediciòn de Pulso
 Ruta /api/records/pulse 
+POST - GET - DELETE
 """
 from flask import request, jsonify, Blueprint
 from api.models import db, Pulse
@@ -31,12 +32,19 @@ def add_pulse_record():
         db.session.add(new_pulse)
         db.session.commit()
 
-        return jsonify({"message": "Registro creado con éxito"}), 201
+        return jsonify({
+            "message": "Registro creado con éxito",
+            "id": new_pulse.id,
+            "pulse": new_pulse.pulse,
+            "manual_datetime": new_pulse.manual_datetime.strftime("%d-%m-%Y %H:%M"),
+            "comments": new_pulse.comments
+            }), 201
 
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al guardar el registro", "error": str(e)}), 500
     
+
 @pulse_blueprint.route('/', methods=['GET'])
 @jwt_required()
 def get_pulse_records():
