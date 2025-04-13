@@ -23,6 +23,7 @@ import OptionalForm from "./pages/OptionalForm"
 import  Dashboard  from "./pages/Dashboard";
 import { LayoutPrivate } from "./pages/LayoutPrivate";
 import SignUp from "./pages/SignUp";
+import Profile from "./pages/Profile";
 
 
 export const router = createBrowserRouter(
@@ -53,6 +54,7 @@ export const router = createBrowserRouter(
         <Route path="/optionalform" element={<OptionalForm />} />
         <Route path= "/dashboard" element={<Dashboard />} />
         <Route path= "/signup" element={<SignUp />} />
+        <Route path= "/profile" element={<Profile />} />
 
       </Route>
       
