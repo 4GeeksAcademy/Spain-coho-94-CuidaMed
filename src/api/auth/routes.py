@@ -74,13 +74,13 @@ def login():
 def google_login():
     data = request.get_json()
     token = data.get("token")
-    print(os.getenv("VITE_GOOGLE_CLIENT_ID"))
+    
     try:
         # Verifica el token
         google_info = id_token.verify_oauth2_token(token, requests.Request(), os.getenv("VITE_GOOGLE_CLIENT_ID"))
 
         email = google_info['email']
-        name = google_info.get('name')
+        
 
         # Buscar o crear usuario en tu BD
         google_user = User.query.filter_by(email=email).first()
