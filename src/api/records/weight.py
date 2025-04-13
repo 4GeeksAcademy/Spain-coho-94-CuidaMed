@@ -31,7 +31,13 @@ def add_weight_record():
         db.session.add(new_weight)
         db.session.commit()
 
-        return jsonify({"message": "Registro creado con éxito"}), 201
+        return jsonify({
+            "message": "Registro creado con éxito",
+            "id": new_weight.id,
+            "weight": new_weight.weight,
+            "manual_datetime": new_weight.manual_datetime.strftime("%d-%m-%Y %H:%M"),
+            "comments": new_weight.comments
+            }), 201
 
     except Exception as e:
         db.session.rollback()

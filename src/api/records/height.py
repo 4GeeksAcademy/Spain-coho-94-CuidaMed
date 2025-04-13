@@ -32,7 +32,13 @@ def add_height_record():
         db.session.add(new_height)
         db.session.commit()
 
-        return jsonify({"message": "Registro creado con éxito"}), 201
+        return jsonify({
+            "message": "Registro creado con éxito",
+            "id": new_height.id,
+            "height": new_height.height,
+            "manual_datetime": new_height.manual_datetime.strftime("%d-%m-%Y %H:%M"),
+            "comments": new_height.comments   
+        }), 201
 
     except Exception as e:
         db.session.rollback()
