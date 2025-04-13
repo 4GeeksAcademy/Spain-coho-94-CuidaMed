@@ -9,6 +9,15 @@ import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
+import GlucoseRecords from "./pages/GlucoseRecords";
+import BloodPressureRecords from "./pages/BloodPressureRecords";
+import PulseRecords from "./pages/PulseRecords";
+import WeightRecords from "./pages/WeightRecords";
+import AllergyRecords from "./pages/AllergyRecords";
+import MedicalHistoryRecords from "./pages/MedicalHistoryRecords";
+import PersonalAntecedentRecords from "./pages/PersonalAntecedent";
+import MedicationRecords from "./pages/MedicationRecords";
+import HeightRecords from "./pages/HeightRecords";
 import Login from "./pages/Login"
 import OptionalForm from "./pages/OptionalForm" 
 import  Dashboard  from "./pages/Dashboard";
@@ -31,6 +40,15 @@ export const router = createBrowserRouter(
         <Route path= "/" element={<Home />} />
         <Route path="/single/:theId" element={ <Single />} />  {/* Dynamic route for single items */}
         <Route path="/demo" element={<Demo />} />
+        <Route path="/records/glucose" element={<GlucoseRecords/>}/>
+        <Route path="/records/bloodpressure" element={<BloodPressureRecords/>}/>
+        <Route path="/records/pulse" element={<PulseRecords/>}/>
+        <Route path="/records/weight" element={<WeightRecords/>}/>
+        <Route path="/records/height" element={<HeightRecords/>}/>
+        <Route path="/records/allergies" element={<AllergyRecords/>}/>
+        <Route path="/records/medicalhistory" element={<MedicalHistoryRecords/>}/>
+        <Route path="/records/personalhistory" element={<PersonalAntecedentRecords/>}/>
+        <Route path="/records/medication" element={<MedicationRecords/>}/>
         <Route path= "/login" element={<Login />} />
         <Route path="/optionalform" element={<OptionalForm />} />
         <Route path= "/dashboard" element={<Dashboard />} />
