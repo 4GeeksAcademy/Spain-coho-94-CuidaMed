@@ -19,7 +19,7 @@ def create_medication():
     if 'medication_name' not in data:
         return jsonify({"message": "El nombre del medicamento es obligatorio"}), 400
     
-    # Crear nuevo objeto de medicamento
+    # Crear nuevo tratamiento
     new_medication = Medication(
         user_id=current_user_id,
         medication_name=data['medication_name'],
@@ -68,3 +68,19 @@ def get_medications():
     
     except Exception as e:
         return jsonify({"msg": "Error al obtener los tratamientos", "error": str(e)}), 500
+    
+@medications_blueprint.route('/<int:medication_id>', methods=['DELETE'])
+@jwt_required()
+def delete_medication(medication_id):
+
+    current_user_id = get_jwt_identity()
+    
+    medication = Medication.query.filter_by(id=medication_id, user_id=current_user_id).first()
+    
+    if not medication:
+        return jsonify({"message": "Medicamento no encontrado"}), 404
+
+    db.session.delete(medication)
+    db.session.commit()
+    
+    return jsonify({"message": "Medicamento eliminado con éxito"}), 200
