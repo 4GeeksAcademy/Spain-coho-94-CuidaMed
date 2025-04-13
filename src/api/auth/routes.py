@@ -7,6 +7,10 @@ from api.models import db, User
 from api.utils import APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+import os
+import secrets
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -65,3 +69,39 @@ def login():
         "access_token": access_token,
         "user_id": user.id
     }), 200
+
+@auth_bp.route("/google-login", methods=["POST"])
+def google_login():
+    data = request.get_json()
+    token = data.get("token")
+    print(os.getenv("VITE_GOOGLE_CLIENT_ID"))
+    try:
+        # Verifica el token
+        google_info = id_token.verify_oauth2_token(token, requests.Request(), os.getenv("VITE_GOOGLE_CLIENT_ID"))
+
+        email = google_info['email']
+        name = google_info.get('name')
+
+        # Buscar o crear usuario en tu BD
+        google_user = User.query.filter_by(email=email).first()
+        if not google_user:
+            random_password = secrets.token_urlsafe(32)
+            is_new_user = True
+            google_user = User(email=email, password=random_password)  # o un campo especial
+            db.session.add(google_user)
+            db.session.commit()
+        else:
+            is_new_user = False
+
+        # Generar token JWT interno
+        access_token = create_access_token(identity=str(google_user.id))
+
+        return jsonify({
+            "message": "Usuario registrado exitosamente",
+            "user_id": google_user.id,
+            "access_token": access_token,
+            "new_user": is_new_user
+        }), 201
+
+    except ValueError:
+        return jsonify({"error": "Token inválido"}), 401

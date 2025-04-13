@@ -1,6 +1,7 @@
 import React from "react"
 import { useState } from "react"
 import { useNavigate} from "react-router"
+import LoginGoogle from './LoginGoogle';
 
 
 const LoginForm = () => {
@@ -152,19 +153,9 @@ const LoginForm = () => {
                   <hr className="flex-grow-1" />
               </div>
 
-              <button
-                  type="button"
-                  className="btn btn-outline-secondary w-100 d-flex align-items-center justify-content-center"
-                  //onClick={handleGoogleSignUp} pendiente de completar
-                  disabled={isGoogleLoading}
-              >
-                  {isGoogleLoading ? (
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  ) : (
-                  <GoogleIcon className="me-2" />
-                  )}
-                  Continúa con Google
-              </button>
+              <div className="d-flex justify-content-center">
+                <LoginGoogle />
+              </div>
 
               <div className="text-center mt-4">
                   <p className="text-muted mb-0">
