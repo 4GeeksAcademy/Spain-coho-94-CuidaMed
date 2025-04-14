@@ -47,7 +47,36 @@ def create_medical_history():
             'kinship': new_medical_history.kinship,
             'disease': new_medical_history.disease
         }), 201
-
+        
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al guardar el registro antecedentes familiares", "error": str(e)}), 500
+    
+    
+@medical_history_blueprint.route('/', methods=['GET'])
+@jwt_required()
+def get_medical_history():
+    try:
+        current_user_id = get_jwt_identity()
+        
+        user = User.query.get(current_user_id)
+        if not user:
+            return jsonify({"msg": "Usuario no encontrado"}), 404
+        
+        # Buscar todos los antecedentes familiares del usuario
+        medical_histories = MedicalHistory.query.filter_by(user_id=current_user_id).all()
+       
+        return jsonify([
+            {
+            "id": medical_history.id,
+            'kinship': medical_history.kinship,
+            'disease': medical_history.disease
+            }
+            for medical_history in medical_histories
+        ]), 200
+   
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al obtener antecedentes familiares", "error": str(e)}), 500
+    
+
