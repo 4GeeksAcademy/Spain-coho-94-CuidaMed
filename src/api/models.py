@@ -135,7 +135,7 @@ class GeneralData(db.Model):
             'id': self.id,
             'user_id': self.user_id,
             'name': self.name,
-            'birth_date': self.registration_date.strftime("%d-%m-%Y %H:%M") if self.registration_date else None,
+            'birth_date': self.birth_date.strftime("%d-%m-%Y %H:%M") if self.birth_date else None,
             'phone': self.phone,
             'last_weight': self.last_weight,
             'last_height': self.last_height,

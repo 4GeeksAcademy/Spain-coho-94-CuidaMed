@@ -33,7 +33,13 @@ def add_glucose_record():
         db.session.add(new_glucose)
         db.session.commit()
 
-        return jsonify({"message": "Registro creado con éxito"}), 201
+        return jsonify({
+            "message": "Registro creado con éxito",
+            "id": new_glucose.id,
+            "glucose": new_glucose.glucose,
+            "manual_datetime": new_glucose.manual_datetime.strftime("%d-%m-%Y %H:%M"),
+            "comments": new_glucose.comments
+        }), 201
 
     except Exception as e:
         db.session.rollback()
