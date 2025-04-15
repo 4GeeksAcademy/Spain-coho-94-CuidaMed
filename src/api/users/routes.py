@@ -241,8 +241,8 @@ def update_general_data():
             general_data.phone = data['phone']
 
         if 'gender' in data:
-            general_data.gender = Gender[data['gender']] if data['gender'] in [
-                g.name for g in Gender] else None
+            general_data.gender = Gender(data['gender']) if data['gender'] in [
+                g.value for g in Gender] else None
 
         if 'last_weight' in data:
              general_data.last_weight = float(data['last_weight']) if data['last_weight'] is not None else None
@@ -252,16 +252,16 @@ def update_general_data():
                 data['last_height']) if data['last_height'] is not None else None
 
         if 'blood_type' in data:
-            general_data.blood_type = BloodType[data['blood_type']] if data['blood_type'] in [
-                bt.name for bt in BloodType] else None
+            general_data.blood_type = BloodType(data['blood_type']) if data['blood_type'] in [
+                bt.value for bt in BloodType] else None
 
         if 'dietary_preferences' in data:
             general_data.dietary_preferences = data['dietary_preferences']
 
         if 'physical_activity' in data:
             general_data.physical_activity = (
-                PhysicalActivity[data['physical_activity']]
-                if data['physical_activity'] in [pa.name for pa in PhysicalActivity]
+                PhysicalActivity(data['physical_activity'])
+                if data['physical_activity'] in [pa.value for pa in PhysicalActivity]
                 else None
             )
 
