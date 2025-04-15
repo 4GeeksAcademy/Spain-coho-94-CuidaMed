@@ -62,6 +62,7 @@ export const router = createBrowserRouter(
         <Route path="/records/medication" element={<MedicationRecords />} />
         <Route path="/optionalform" element={<OptionalForm />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
 
       <Route path="/login" element={<Login />} />
