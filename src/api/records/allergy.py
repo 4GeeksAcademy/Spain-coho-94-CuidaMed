@@ -75,7 +75,7 @@ def get_allergies():
                 "id": allergy.id,
                 "allergen": allergy.allergen,
                 "symptoms": allergy.symptoms,
-                "severity": allergy.severity.givalue,
+                "severity": allergy.severity.value,
             }
             for allergy in allergies
         ]), 200
@@ -83,3 +83,25 @@ def get_allergies():
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al obtener alergias", "error": str(e)}), 500
+
+    
+@allergy_blueprint.route('/<int:allergy_id>', methods=['DELETE'])
+@jwt_required()
+def delete_allergy(allergy_id):
+    try:
+        current_user_id = get_jwt_identity()
+        
+        allergy = Allergy.query.filter_by(id=allergy_id, user_id=current_user_id).first()
+        
+        # Verificar si existe
+        if not allergy:
+            return jsonify({'msg': 'Registro de alergia no encontrado'}), 404
+        
+        db.session.delete(allergy)
+        db.session.commit()
+        
+        return jsonify({'msg': 'Alergia eliminada correctamente'}), 200
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al eliminar alergias", "error": str(e)}), 500
