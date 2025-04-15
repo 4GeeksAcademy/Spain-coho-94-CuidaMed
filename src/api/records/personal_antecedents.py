@@ -43,6 +43,7 @@ def create_personal_antecedents():
         
         return jsonify(new_personal_antecedent.serialize_personal_antecedent()), 201
 
+
 @personal_antecedents_blueprint.route('/', methods=['GET'])
 @jwt_required()
 def get_personal_antecedents():
@@ -66,6 +67,31 @@ def get_personal_antecedents():
     
     except Exception as e:
         return jsonify({"msg": "Error al obtener los antecedentes personales", "error": str(e)}), 500
+    
+    
+@personal_antecedents_blueprint.route('/<int:antecedent_id>', methods=['DELETE'])
+@jwt_required()
+def delete_personal_antecedents(antecedent_id):
+    try:
+
+        current_user_id = get_jwt_identity()
+
+        # Buscar el antecedente por ID
+        antecedent_history = PersonalAntecedent.query.filter_by(
+                id=antecedent_id, user_id=current_user_id).first()
+        
+        # Verificar que existe el antecedente
+        if not antecedent_history:
+            return jsonify({"msg": "Antecedentes personales no encontrado"}), 404
+        
+        db.session.delete(antecedent_history)
+        db.session.commit()
+        
+        return jsonify({"msg": "Este antecedente ha sido eliminado correctamente"}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al eliminar el este antecedente: " + str(e)}), 500
 
 
         
