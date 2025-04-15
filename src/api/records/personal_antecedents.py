@@ -43,5 +43,29 @@ def create_personal_antecedents():
         
         return jsonify(new_personal_antecedent.serialize_personal_antecedent()), 201
 
+@personal_antecedents_blueprint.route('/', methods=['GET'])
+@jwt_required()
+def get_personal_antecedents():
+    try:
+        current_user_id = get_jwt_identity()
+        
+        user = User.query.get(current_user_id)
+        if not user:
+            return jsonify({"msg": "Usuario no encontrado"}), 404
+        
+        # Obtener todos los antecedentes personales del usuario
+        antecedents = PersonalAntecedent.query.filter_by(user_id=current_user_id).all()
+        
+        # Si no hay antecedentes
+        if not antecedents:
+            return jsonify({"msg": "Antecedentes no existentes"}), 200
+        
+        result = [antecedent.serialize_personal_antecedent() for antecedent in antecedents]
+        
+        return jsonify(result), 200
+    
+    except Exception as e:
+        return jsonify({"msg": "Error al obtener los antecedentes personales", "error": str(e)}), 500
+
 
         
