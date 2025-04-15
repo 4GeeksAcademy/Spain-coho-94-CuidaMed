@@ -28,7 +28,6 @@ const EmergencyContact = () => {
         emailContact: "",
     });
     const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const accessToken = localStorage.getItem("accessToken");
 
@@ -62,6 +61,7 @@ const EmergencyContact = () => {
                 setError({...error, list: error.message })
             }
         }
+        fetchRecordData()
     }, [])
 
 
@@ -180,6 +180,13 @@ const EmergencyContact = () => {
             setError({...error, form: error.message })
         } finally {
             setLoading(false)
+            setFormData({
+                firstNameContact: "",
+                lastNameContact: "",
+                relationshipType:"",
+                phoneContact:"",
+                emailContact: "",
+            })
         }
     }
 
@@ -308,23 +315,54 @@ const EmergencyContact = () => {
                 </div>
                 <div className="col-md-4 ms-3">
                     <div className="card me-2 h-100">
-                        <h5 className="card-header bg-primary text-white">Contactos de emegencia</h5>
-                        {error.list && (
-                            <div className="alert alert-danger mb-4" role="alert">
-                                {error.list}
-                            </div>
-                        )}
-                        <div className="card-body d-flex flex-column align-items-center">
-                            {emergencyContact.firstNameContact === "" && <p>No ha añadido ningun contacto</p>}
+                        <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h5 className="m-0">Contacto de emegencia</h5>
+                            <button 
+                                type="button" 
+                                className="btn text-white"
+                                onClick={handleDelete}
+                            >
+                                <i className="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+
+                        <div className="card-body p-4">
+                            {emergencyContact.firstNameContact === "" && <p>No se ha encontrado ningún contacto</p>}
                             {emergencyContact.firstNameContact !== "" &&
                                 (
-                                    <div>
-                                        <h3>{`${emergencyContact.firstNameContact} ${emergencyContact.lastNameContact}`}</h3>
-                                        <EmergencyContactQR phoneContact={emergencyContact.phoneContact}/> 
-                                        <p className="m-3">Email: {emergencyContact.emailContact}</p>
-                                    </div> 
+                                    <>
+                                        <div className="text-center mb-4">
+                                            <h3 className="fw-bold">{`${emergencyContact.firstNameContact} ${emergencyContact.lastNameContact}`}</h3>
+                                            <div className="text-muted small">
+                                            <i className="fas fa-phone me-1"></i>
+                                            <span>{emergencyContact.phoneContact}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="d-flex flex-column align-items-center">
+                                            <div className="border border-primary border-3 rounded p-2 bg-white">
+                                            <EmergencyContactQR phoneContact={emergencyContact.phoneContact}/>
+                                            </div>
+
+                                            <div className="mt-3 bg-light p-3 rounded text-center" style={{ maxWidth: "320px" }}>
+                                            <div className="text-primary fw-medium mb-1">
+                                                <i className="fas fa-info-circle me-1"></i>
+                                                <span>Información del código QR</span>
+                                            </div>
+                                            <p className="text-secondary small mb-0">
+                                                Este código QR contiene el número de teléfono de contacto de emergencia. Escanéalo para llamar
+                                                rápidamente en caso de emergencia.
+                                            </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="d-flex justify-content-center align-items-center gap-2 text-muted mt-4 pt-3 border-top">
+                                            <i className="fas fa-envelope"></i>
+                                            <span>Email: {emergencyContact.emailContact}</span>
+                                        </div>
+                                    </>
                                 )
-                            }
+                            }  
                         </div>
                     </div>
                 </div>

@@ -6,8 +6,8 @@ const EmergencyContactQR = ({phoneContact}) => {
     <div className="container">
       
       {phoneContact && (
-        <div className="text-center mt-4">
-          <QRCodeSVG value={`tel:${phoneContact}`} size={180} />
+        <div className="text-center ">
+          <QRCodeSVG value={`tel:${phoneContact}`} size={180} marginSize={1}/>
         </div>
       )}
     </div>
