@@ -4,7 +4,7 @@ Ruta /api/records/allergy
 Metodo POST - GET - DELETE
 """
 from flask import request, jsonify, Blueprint
-from api.models import db, Allergy, SeverityEnum
+from api.models import db, User, Allergy, SeverityEnum
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
 from enum import Enum
@@ -51,3 +51,35 @@ def create_allergy():
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": "Error al registrar alergia", "error": str(e)}), 500
+    
+
+
+@allergy_blueprint.route('/', methods=['GET'])
+@jwt_required()
+def get_allergies():
+    try:
+        current_user_id = get_jwt_identity()
+        
+        user = User.query.get(current_user_id)
+        if not user:
+            return jsonify({"msg": "Usuario no encontrado"}), 404
+        
+        # Buscar todas las alergias del usuario
+        allergies = Allergy.query.filter_by(user_id=current_user_id).all()
+
+        if not allergies:
+            return jsonify({"msg": "Registro de alergia no encontrado"}), 404
+       
+        return jsonify([
+            {
+                "id": allergy.id,
+                "allergen": allergy.allergen,
+                "symptoms": allergy.symptoms,
+                "severity": allergy.severity.givalue,
+            }
+            for allergy in allergies
+        ]), 200
+   
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al obtener alergias", "error": str(e)}), 500
