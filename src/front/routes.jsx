@@ -9,6 +9,7 @@ import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
 import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
+import EmergencyContact from "./pages/EmergencyContact";
 import LandingPage from "./pages/LandingPage";
 import GlucoseRecords from "./pages/GlucoseRecords";
 import BloodPressureRecords from "./pages/BloodPressureRecords";
@@ -40,6 +41,7 @@ export const router = createBrowserRouter(
         <Route path="/single/:theId" element={<Single />} />{" "}
         {/* Dynamic route for single items */}
         <Route path="/demo" element={<Demo />} />
+        <Route path="/emergencycontact" element={<EmergencyContact />} />
         <Route path="/records/glucose" element={<GlucoseRecords />} />
         <Route
           path="/records/bloodpressure"
