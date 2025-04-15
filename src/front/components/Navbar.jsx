@@ -27,10 +27,10 @@ export const Navbar = () => {
         {/* Contenido colapsable */}
         <div className="collapse navbar-collapse" id="navbarContent">
 
-          <div className="d-flex align-items-center">
+          <div className="ms-auto d-flex align-items-center gap-3">
             <Link
               to="/login"
-              className="text-decoration-none me-3 d-none d-md-block"
+              className="text-decoration-none"
             >
               Accede
             </Link>

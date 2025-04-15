@@ -35,12 +35,11 @@ export const router = createBrowserRouter(
     // Note: The child paths of the Layout element replace the Outlet component with the elements contained in the "element" attribute of these child paths.
     <>
       // Root Route: All navigation will start from here.
+      <Route path="/" element={<Layout />}>
+        <Route index element={<LandingPage />} />
+      </Route>
+
       <Route path="/" element={<LayoutPrivate />}>
-        {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
-        <Route path="/" element={<Home />} />
-        <Route path="/single/:theId" element={<Single />} />{" "}
-        {/* Dynamic route for single items */}
-        <Route path="/demo" element={<Demo />} />
         <Route path="/emergencycontact" element={<EmergencyContact />} />
         <Route path="/records/glucose" element={<GlucoseRecords />} />
         <Route
@@ -63,9 +62,7 @@ export const router = createBrowserRouter(
         <Route path="/optionalform" element={<OptionalForm />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Route>
-      <Route path="/" element={<Layout />}>
-        <Route path="/home" element={<LandingPage />} />
-      </Route>
+
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="/*" element={<h1>No se ha encontrado la página</h1>} />
