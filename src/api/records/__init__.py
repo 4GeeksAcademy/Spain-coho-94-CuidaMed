@@ -9,9 +9,6 @@ from .blood_pressure import blood_pressure_blueprint
 from .emergency_contact import emergency_contact_blueprint
 from .glucose import glucose_blueprint
 from .height import height_blueprint
-<< << << < HEAD
-== == == =
->>>>>> > 1e9405e(Registro blueprint de la ruta antecedentes-personales)
 
 records_blueprint = Blueprint('records', __name__)
 
