@@ -60,7 +60,7 @@ const Submenu = () => {
 
           {/* Contacto de Emergencias */}
           <Link
-            to="/emergency-contacts"
+            to="/emergencycontact"
             className="btn btn-cuidamed d-flex align-items-center me-3 mb-2 mb-md-0"
           >
             <i className="fa-solid fa-phone me-2"></i>
