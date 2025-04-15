@@ -1,0 +1,386 @@
+import React, { useState, useEffect } from "react";
+import useGlobalReducer from "../hooks/useGlobalReducer";
+
+
+const MedicationRecords= () => {
+    const { store, dispatch } = useGlobalReducer();
+    const [formData, setFormData] = useState({
+        medicationName: "",
+        dosageInstructions:"",
+        adverseReactions:"",
+        treatmentStartDate: undefined,
+        treatmentEndDate: undefined,
+    })
+    const [medication, setMedication] = useState([
+        {
+            id: 1,
+            medicationName: "Paracetamol",
+            dosageInstructions: "500 mg cada 8 horas durante 5 días",
+            adverseReactions: "Náuseas leves",
+            treatmentStartDate: "2023-01-10",
+            treatmentEndDate: "2023-01-15"
+          },
+          {
+            id: 2,
+            medicationName: "Ibuprofeno",
+            dosageInstructions: "400 mg cada 6 horas con comida",
+            adverseReactions: "Dolor de estómago",
+            treatmentStartDate: "2022-11-05",
+            treatmentEndDate: "2022-11-10"
+          },
+          {
+            id: 3,
+            medicationName: "Amoxicilina",
+            dosageInstructions: "875 mg cada 12 horas por 7 días",
+            adverseReactions: "Erupción cutánea",
+            treatmentStartDate: "2023-04-01",
+            treatmentEndDate: "2023-04-08"
+          },
+          {
+            id: 4,
+            medicationName: "Metformina",
+            dosageInstructions: "850 mg dos veces al día",
+            adverseReactions: "Diarrea ocasional",
+            treatmentStartDate: "2021-06-15",
+            treatmentEndDate: "2021-12-15"
+          },
+          {
+            id: 5,
+            medicationName: "Losartán",
+            dosageInstructions: "50 mg una vez al día por la mañana",
+            adverseReactions: "Fatiga leve",
+            treatmentStartDate: "2022-03-20",
+            treatmentEndDate: "2022-06-20"
+          },
+          {
+            id: 6,
+            medicationName: "Omeprazol",
+            dosageInstructions: "20 mg antes del desayuno",
+            adverseReactions: "Dolor de cabeza leve",
+            treatmentStartDate: "2023-05-01",
+            treatmentEndDate: "2023-05-21"
+          },
+          {
+            id: 7,
+            medicationName: "Loratadina",
+            dosageInstructions: "10 mg una vez al día en la noche",
+            adverseReactions: "Somnolencia leve",
+            treatmentStartDate: "2022-04-10",
+            treatmentEndDate: "2022-04-17"
+          },
+          {
+            id: 8,
+            medicationName: "Prednisona",
+            dosageInstructions: "5 mg cada 12 horas",
+            adverseReactions: "Aumento de apetito",
+            treatmentStartDate: "2022-08-01",
+            treatmentEndDate: "2022-08-15"
+          }
+    ])
+
+    const [error, setError] = useState({
+        form: "",
+        list: "",
+        medicationName: "",
+        dosageInstructions:"",
+        adverseReactions:"",
+        treatmentStartDate:"",
+        treatmentEndDate:""
+    });
+    const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+
+    useEffect(() => {
+        const fetchRecordData = async () => {
+            try {
+                
+                const response = await fetch(/* URL*/"",
+                    {
+                        method: 'GET',
+                        headers: {
+                            "Content-Type": "application/json",
+                            // Enviamos el token a BD en el header.
+                            "Authorization": `Bearer ${store.token}`
+                        }
+                    });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Error al obtener el historial de antecedentes personales")
+                }
+
+                setMedication(/* data.loquesea */)
+
+            } catch (error) {
+                setError(...error, { list: error.message })
+            }
+        }
+    }, [])
+
+
+    const validateForm = () => {
+
+        let valid = true
+        const newErrors = { ...error }   
+        const treatmentStartDate = new Date(formData.treatmentStartDate)
+        const treatmentEndDate = new Date(formData.treatmentEndDate)
+
+        if (!formData.medicationName) {
+            newErrors.medicationName = "Por favor, introduzca el nombre del medicamento" //Actualizar con el valor máximo en la BD
+            valid = false
+        }else if (formData.medicationName.length > 100) {
+            newErrors.medicationName = "El valor máximo de caracteres es 100" //Actualizar con el valor máximo en la BD
+            valid = false
+        }
+
+        if (!formData.dosageInstructions) {
+            newErrors.dosageInstructions = "Por favor, introduzca la pauta" //Actualizar con el valor máximo en la BD
+            valid = false
+        }else if (formData.dosageInstructions.length > 300) {
+            newErrors.dosageInstructions = "El valor máximo de caracteres es 300" //Actualizar con el valor máximo en la BD
+            valid = false
+        }
+
+        if (formData.adverseReactions.length > 300) {
+            newErrors.adverseReactions = "El valor máximo de caracteres es 300" //Actualizar con el valor máximo en la BD
+            valid = false
+        }
+
+        if (treatmentStartDate > treatmentEndDate) {
+            newErrors.treatmentEndDate = "La fecha fin debe ser superior a la de inicio del tratamiento"
+            valid = false
+        }
+
+        setError(newErrors)
+        return valid
+    }
+    const handleChange = (e) => {
+        const { name, value } = e.target
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }))
+
+        // Para borrar los errores al corregir el campo
+        if (error[name]) {
+            setError((prev) => ({
+                ...prev,
+                [name]: "",
+            }))
+        }
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!validateForm()) {
+            return
+        }
+        setLoading(true);
+
+        try {
+            
+            /*const response = await fetch(""/*URL backend, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    // Enviamos el token a BD en el header.
+                    "Authorization": `Bearer ${store.token}`
+                },
+                body: JSON.stringify(formData) //Aqui tenemos que mapear los campos del backend y frontend
+            })
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Error al crear el registro");
+            }
+            */
+            setMedication([formData, ...medication]) //Actualizamos el estado pero hace falta el mapeo
+
+        } catch (error) {
+            setError(error.data)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handlePage = (page) => {
+        setCurrentPage(page)
+    }
+
+    const handleDelete = async (recordId) => {
+        try {
+            /*const response = await fetch(/* backend_url con el id del record"",
+                {
+                    method: 'DELETE',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${store.token}`
+                    }
+                }
+            )
+            if (!response.ok) throw new Error("Error al eliminar el registro");
+            */
+            setMedication(medication.filter((record)=> record.id !== recordId ))
+            
+        } catch (error) {
+            setError(...error,{ list: error.message })
+        }
+
+    }
+    return (
+        <>
+            <div className="row g-4 mt-2">
+                <div className="col-12 col-lg-4 order-1">
+                    <div className="card ms-2 ">
+                        <h5 className="card-header bg-primary text-white">Añade un nuevo registro</h5>
+                        <div className="card-body">
+                            <h5 className="card-title">Tratamientos</h5>
+                            {error.form && (
+                                <div className="alert alert-danger mb-4" role="alert">
+                                    {error.form}
+                                </div>
+                            )}
+                            <form onSubmit={handleSubmit} noValidate>
+                                
+                                <div className="mb-3">
+                                    <label htmlFor="medicationName" className="form-label">Medicamento</label>
+                                    <input
+                                        className={`form-control ${error.medicationName ? 'is-invalid' : ''}`}
+                                        id="medicationName"
+                                        name="medicationName"
+                                        value={formData.medicationName}
+                                        onChange={handleChange}
+                                    />
+                                    {error.medicationName && <div className="invalid-feedback">{error.medicationName}</div>}
+                                </div>
+                                <div className="mb-3">
+                                    <label htmlFor="dosageInstructions" className="form-label">Pauta</label>
+                                    <input
+                                        className={`form-control ${error.dosageInstructions ? 'is-invalid' : ''}`}
+                                        id="dosage"
+                                        name="dosageInstructions"
+                                        value={formData.dosageInstructions}
+                                        onChange={handleChange}
+                                    />
+                                    {error.dosageInstructions && <div className="invalid-feedback">{error.dosageInstructions}</div>}
+                                </div>
+
+                                <div className="mb-3">
+                                    <label htmlFor="adverseReactions" className="form-label">Reacciones adversas</label>
+                                    <textarea
+                                        className={`form-control ${error.adverseReactions ? 'is-invalid' : ''}`}
+                                        id="adverseReactions"
+                                        rows="3"
+                                        name="adverseReactions"
+                                        value={formData.adverseReactions}
+                                        onChange={handleChange}
+                                    />
+                                    {error.adverseReactions && <div className="invalid-feedback">{error.adverseReactions}</div>}
+                                </div>
+
+                                <div className="mb-3">
+                                    <label htmlFor="startDate" className="form-label">Fecha de inicio</label>
+                                    <input
+                                        type="date"
+                                        className={`form-control ${error.treatmentStartDate ? 'is-invalid' : ''}`}
+                                        id="startDate"
+                                        name="treatmentStartDate"
+                                        value={formData.treatmentStartDate}
+                                        onChange={handleChange}
+                                    />
+                                    {error.treatmentStartDate && (
+                                        <div className="invalid-feedback">{error.treatmentStartDate}</div>
+                                    )}
+                                </div>
+
+                                <div className="mb-3">
+                                    <label htmlFor="endDate" className="form-label">Fecha de fin</label>
+                                    <input
+                                        type="date"
+                                        className={`form-control ${error.treatmentEndDate ? 'is-invalid' : ''}`}
+                                        id="endDate"
+                                        name="treatmentEndDate"
+                                        value={formData.treatmentEndDate}
+                                        onChange={handleChange}
+                                    />
+                                    {error.treatmentEndDate && (
+                                        <div className="invalid-feedback">{error.treatmentEndDate}</div>
+                                    )}
+                                </div>
+
+                                <button type="submit" className="btn btn-primary">Añadir registro</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-12 col-lg-8 order-2">
+                    <div className="card me-2 h-100">
+                        <h5 className="card-header bg-primary text-white">Tratamientos</h5>
+                        {error.list && (
+                            <div className="alert alert-danger mb-4" role="alert">
+                                {error.list}
+                            </div>
+                        )}
+                        <div className="card-body d-flex flex-column table-responsive">
+                            <table className="table table-hover table-sm overflow-x-auto">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" style={{ width: "50px" }}>Medicamento</th>
+                                        <th scope="col" style={{ width: "200px" }}>Pauta</th>
+                                        <th scope="col" style={{ width: "200px" }}>Reacciones adversas</th>
+                                        <th scope="col" style={{ width: "100px" }}>Incio</th>
+                                        <th scope="col" style={{ width: "100px" }}>Fin</th>
+                                        <th scope="col" style={{ width: "50px" }}></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {medication && medication.slice((currentPage - 1) * 8, currentPage * 8).map((data) => {
+                                        return (
+                                            <tr key={data.id}>
+                                                <td>{data.medicationName}</td>
+                                                <td>{data.dosageInstructions}</td>
+                                                <td>{data.adverseReactions}</td>
+                                                <td>{data.treatmentStartDate}</td>
+                                                <td>{data.treatmentEndDate}</td>
+                                                <td><button className="btn" onClick={()=>handleDelete(data.id)}><i className="text-danger fa-solid fa-trash"></i></button></td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                            <nav className="mt-auto" aria-label="Page navigation example">
+                                <ul className="pagination justify-content-end">
+                                    <li className={`page-item ${currentPage==1 ? "disabled":""} `}>
+                                        <button className="page-link" onClick={() => handlePage(currentPage - 1)}>
+                                            Anterior
+                                        </button>
+                                    </li>
+
+                                    {medication && medication.length > 8 && Array.from({ length: Math.ceil(medication.length / 8) }, (_, index) => (
+                                        <li key={index} className="page-item">
+                                            <button className="page-link" onClick={() => handlePage(index + 1)}>
+                                                {index + 1}
+                                            </button>
+                                        </li>
+                                        ))
+                                    }
+
+                                    <li className={`page-item ${currentPage== Math.ceil(medication.length / 8) ? "disabled":""} `}>
+                                        <button className="page-link" onClick={() => handlePage(currentPage + 1)}>
+                                            Siguiente
+                                        </button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    )
+
+}
+
+export default MedicationRecords
