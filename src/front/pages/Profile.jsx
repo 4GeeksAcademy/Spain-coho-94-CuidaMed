@@ -102,9 +102,9 @@ const Profile = () => {
 
     //Calcular IMC
     useEffect(() => {
-        
+
         if (formData.lastHeight && formData.lastWeight) {
-            
+
 
             const heightInMetersReplace = formData.lastHeight.toString().replace(',', '.');
             const weightInKgReplace = formData.lastWeight.toString().replace(',', '.');
@@ -213,7 +213,7 @@ const Profile = () => {
         const day = String(dateObj.getDate()).padStart(2, "0");
         const month = String(dateObj.getMonth() + 1).padStart(2, "0"); // enero = 0
         const year = dateObj.getFullYear();
-      
+
         return `${day}-${month}-${year}`;
     }
 
@@ -387,6 +387,18 @@ const Profile = () => {
 
                                         </select>
                                     </div>
+                                    <div className="mb-3">
+                                    <label htmlFor="dietaryPreferences" className="form-label">Preferencias de dieta</label>
+                                    <input
+                                        className={`form-control ${error.dietaryPreferences ? 'is-invalid' : ''}`}
+                                        type="text"
+                                        id="dietaryPreferences"
+                                        name="dietaryPreferences"
+                                        value={formData.dietaryPreferences}
+                                        onChange={handleChange}
+                                    />
+                                    {error.dietaryPreferences && <div className="invalid-feedback">{error.dietaryPreferences}</div>}
+                                    </div>
 
                                 </div>
                                 <div className="col-md-6">
@@ -429,66 +441,71 @@ const Profile = () => {
                                             disabled
                                         />
                                         {imc && (
-                                            <div className="alert alert-info m-1 p-2">
-                                                <strong>IMC:</strong>{" "}
-                                                {
-                                                    imc < 18.5
-                                                        ? "Bajo peso"
-                                                        : imc < 25
-                                                            ? "Peso normal"
-                                                            : imc < 30
-                                                                ? "Sobrepeso"
-                                                                : "Obesidad"
-                                                }
+                                            <div className="alert alert-info mt-2 mb-2">
+                                                <div className="d-flex align-items-center">
+                                                    <div className="me-3">
+                                                        <strong className="fs-5">IMC:</strong> {imc}
+                                                    </div>
+                                                    <div>
+                                                        <span className={`badge ${imc < 18.5 ? "bg-warning" :
+                                                                imc < 25 ? "bg-success" :
+                                                                    imc < 30 ? "bg-warning" :
+                                                                        "bg-danger"
+                                                            } p-2`}>
+                                                            {imc < 16 ? "Delgadez severa" :
+                                                                imc < 17 ? "Delgadez moderada" :
+                                                                    imc < 18.5 ? "Delgadez leve" :
+                                                                        imc < 25 ? "Peso normal" :
+                                                                            imc < 30 ? "Sobrepeso" :
+                                                                                imc < 35 ? "Obesidad grado I" :
+                                                                                    imc < 40 ? "Obesidad grado II" :
+                                                                                        "Obesidad grado III"}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <hr className="my-2" />
+                                                <small>
+                                                    El IMC es un indicador que relaciona el peso y la altura. Se considera saludable un IMC entre 18.5 y 24.9
+                                                </small>
                                             </div>
+                                            
                                         )}
 
-                                        {error.BMI && <div className="invalid-feedback">{error.BMI}</div>}
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="dietaryPreferences" className="form-label">Preferencias de dieta</label>
-                                        <input
-                                            className={`form-control ${error.dietaryPreferences ? 'is-invalid' : ''}`}
-                                            type="text"
-                                            id="dietaryPreferences"
-                                            name="dietaryPreferences"
-                                            value={formData.dietaryPreferences}
-                                            onChange={handleChange}
-                                        />
-                                        {error.dietaryPreferences && <div className="invalid-feedback">{error.dietaryPreferences}</div>}
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="physicalActivity" className="form-label ">
-                                            Nivel de actividad física
-                                        </label>
-                                        <select
-                                            name="physicalActivity"
-                                            id="physicalActivity"
-                                            className="form-select"
-                                            value={formData.physicalActivity}
-                                            onChange={handleChange}
-                                        >
-                                            <option value="">Selecciona una opción</option>
-                                            <option value="Sedentario">Sedentario</option>
-                                            <option value="Leve">Leve</option>
-                                            <option value="Moderado">Moderado</option>
-                                            <option value="Intenso">Intenso</option>
-                                            <option value="Atleta">Atleta</option>
-                                        </select>
-                                    </div>
+                                    {error.BMI && <div className="invalid-feedback">{error.BMI}</div>}
                                 </div>
-                                <div className="d-flex justify-content-end ">
-                                    <button type="button" className="btn btn-danger me-3">Eliminar perfil</button>
-                                    <button type="submit" className="btn btn-primary">Actualizar perfil</button>
+                                
+                                <div className="mb-3">
+                                    <label htmlFor="physicalActivity" className="form-label ">
+                                        Nivel de actividad física
+                                    </label>
+                                    <select
+                                        name="physicalActivity"
+                                        id="physicalActivity"
+                                        className="form-select"
+                                        value={formData.physicalActivity}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="">Selecciona una opción</option>
+                                        <option value="Sedentario">Sedentario</option>
+                                        <option value="Leve">Leve</option>
+                                        <option value="Moderado">Moderado</option>
+                                        <option value="Intenso">Intenso</option>
+                                        <option value="Atleta">Atleta</option>
+                                    </select>
                                 </div>
-
-                            </form>
-
                         </div>
-                    </div>
-                </div>
+                        <div className="d-flex justify-content-end ">
+                            <button type="button" className="btn btn-danger me-3">Eliminar perfil</button>
+                            <button type="submit" className="btn btn-primary">Actualizar perfil</button>
+                        </div>
 
+                    </form>
+
+                </div>
             </div>
+        </div >
+
+            </div >
         </>
     )
 
