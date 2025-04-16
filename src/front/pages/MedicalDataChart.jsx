@@ -126,7 +126,11 @@ const MedicalDataChart = () => {
                     break;
             }
             // Ordenar por fecha el formattedData
-            formattedData.sort((a,b) => new Date(a.date) - new Date(b.date));
+            const parseDate = (dateStr) => {
+                const [day, month, year] = dateStr.split('/');
+                return new Date(year, month - 1, day);
+            };
+            formattedData.sort((a, b) => parseDate(a.date) - parseDate(b.date));
             setPatientData(formattedData)
         };
         loadData()
