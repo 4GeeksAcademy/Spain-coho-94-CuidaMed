@@ -1,42 +1,13 @@
 import React, { useState, useEffect } from "react";
-import useGlobalReducer from "../hooks/useGlobalReducer";
-
 
 const PersonalAntecedentRecords= () => {
-    const { store, dispatch } = useGlobalReducer();
+    
     const [formData, setFormData] = useState({
         disease: "",
-        diagnosisDate: undefined,
+        diagnosisDate: "",
     }
     )
-    const [personalAntecedent, setPersonalAntecedent] = useState([
-        {
-            id: 1,
-            disease: "Hipertensión",
-            diagnosisDate: "2018-03-15"
-          },
-          {
-            id: 2,
-            disease: "Diabetes tipo 2",
-            diagnosisDate: "2020-07-10"
-          },
-          {
-            id: 3,
-            disease: "Asma",
-            diagnosisDate: "2015-11-22"
-          },
-          {
-            id: 4,
-            disease: "Alergia al polen",
-            diagnosisDate: "2012-05-03"
-          },
-          {
-            id: 5,
-            disease: "Colesterol alto",
-            diagnosisDate: "2019-09-30"
-          },
-          
-    ])
+    const [personalAntecedent, setPersonalAntecedent] = useState([])
 
     const [error, setError] = useState({
         form: "",
@@ -47,18 +18,18 @@ const PersonalAntecedentRecords= () => {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const accessToken = localStorage.getItem("accessToken");
 
     useEffect(() => {
         const fetchRecordData = async () => {
             try {
                 
-                const response = await fetch(/* URL*/"",
+                const response = await fetch(`${backendUrl}/api/records/personal_antecedents`,
                     {
                         method: 'GET',
                         headers: {
                             "Content-Type": "application/json",
-                            // Enviamos el token a BD en el header.
-                            "Authorization": `Bearer ${store.token}`
+                            "Authorization": `Bearer ${accessToken}`
                         }
                     });
                 const data = await response.json();
@@ -67,12 +38,21 @@ const PersonalAntecedentRecords= () => {
                     throw new Error(data.error || "Error al obtener el historial de antecedentes personales")
                 }
 
-                setPersonalAntecedent(/* data.loquesea */)
+                setPersonalAntecedent(
+                    data.map(item => 
+                        ({
+                            recordId:item.id,
+                            disease: item.disease,
+                            diagnosisDate: item.diagnosis_date,
+                        })
+                    )
+                )
 
             } catch (error) {
-                setError(...error, { list: error.message })
+                setError({...error, list: error.message })
             }
         }
+        fetchRecordData();
     }, [])
 
 
@@ -115,6 +95,10 @@ const PersonalAntecedentRecords= () => {
             }))
         }
     }
+    const formatDate = (dateStr) => {
+        const [year, month, day] = dateStr.split("-");
+        return `${day}-${month}-${year}`;
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -124,15 +108,22 @@ const PersonalAntecedentRecords= () => {
         setLoading(true);
 
         try {
-            
-            /*const response = await fetch(""/*URL backend, {
+            const formattedDate = formatDate(formData.diagnosisDate);
+            const response = await fetch(`${backendUrl}/api/records/personal_antecedents`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // Enviamos el token a BD en el header.
-                    "Authorization": `Bearer ${store.token}`
+                    "Authorization": `Bearer ${accessToken}`
                 },
-                body: JSON.stringify(formData) //Aqui tenemos que mapear los campos del backend y frontend
+                body: JSON.stringify(
+                    {
+                     disease:formData.disease,
+                     diagnosisDate:formData.diagnosisDate
+                     ? formattedDate
+                     : "",
+                    }
+                ) 
+
             })
 
             const data = await response.json();
@@ -140,8 +131,8 @@ const PersonalAntecedentRecords= () => {
             if (!response.ok) {
                 throw new Error(data.error || "Error al crear el registro");
             }
-            */
-            setPersonalAntecedent([formData, ...personalAntecedent]) //Actualizamos el estado pero hace falta el mapeo
+            
+            setPersonalAntecedent([formData, ...personalAntecedent]) 
 
         } catch (error) {
             setError(error.data)
