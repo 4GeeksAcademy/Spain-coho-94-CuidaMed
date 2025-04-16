@@ -1,6 +1,8 @@
 """
 En este archivo están todas las rutas de Datos Generales
+Ruta /api/users/dashboard
 Ruta /api/users/general-data
+Ruta /api/users/delete
 """
 from flask import request, jsonify, Blueprint
 from api.models import db, User, GeneralData, Gender, BloodType, PhysicalActivity, BloodPressure, Glucose, Weight, Medication, EmergencyContact
@@ -277,3 +279,24 @@ def update_general_data():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+    
+@users_bp.route('/delete', methods=['DELETE'])
+@jwt_required()
+def delete_user():
+    current_user_id = get_jwt_identity()
+    
+    # Buscar el usuario actual en la base de datos
+    user_to_delete = User.query.get(current_user_id)
+    
+    # Verificar si el usuario existe
+    if not user_to_delete:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+    
+    try:
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        return jsonify({"msg": "Tu cuenta ha sido eliminada correctamente"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Error al eliminar usuario", "error": str(e)}), 500
+
