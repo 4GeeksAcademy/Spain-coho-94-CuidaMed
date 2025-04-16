@@ -52,7 +52,7 @@ export const router = createBrowserRouter(
         <Route path="/records/height" element={<HeightRecords />} />
         <Route path="/records/allergies" element={<AllergyRecords />} />
         <Route
-          path="/records/medicalhistory"
+          path="/records/familyhistory"
           element={<MedicalHistoryRecords />}
         />
         <Route

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import useGlobalReducer from "../hooks/useGlobalReducer";
+
 
 
 const MedicationRecords= () => {
-    const { store, dispatch } = useGlobalReducer();
+    
     const [formData, setFormData] = useState({
         medicationName: "",
         dosageInstructions:"",
