@@ -31,7 +31,7 @@ const Graphics = ({ chartType, setChartType, patientData, dataKeys, dataType }) 
         switch (dataType) {
             case 'glucose': return 'Glucosa (mg/dL)';
             case 'weight': return 'Peso (kg)';
-            case 'blood_pressure': return 'Presión (mmHg)';
+            case 'bloodpressure': return 'Presión (mmHg)';
             case 'pulse': return 'Pulso (bpm)';
             default: return '';
         }

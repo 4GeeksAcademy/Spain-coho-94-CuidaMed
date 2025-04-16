@@ -51,7 +51,7 @@ const Submenu = () => {
               Estadísticas
             </button>
             <ul className="dropdown-menu">
-              <li><Link to="/statistics/blood_pressure" className="dropdown-item"><i className="fa-solid fa-heart me-2"></i> Tensión arterial</Link></li>
+              <li><Link to="/statistics/bloodpressure" className="dropdown-item"><i className="fa-solid fa-heart me-2"></i> Tensión arterial</Link></li>
               <li><Link to="/statistics/pulse" className="dropdown-item"><i className="fa-solid fa-heart-pulse me-2"></i> Pulso</Link></li>
               <li><Link to="/statistics/glucose" className="dropdown-item"><i className="fa-solid fa-syringe me-2"></i> Glucosa</Link></li>
               <li><Link to="/statistics/weight" className="dropdown-item"><i className="fa-solid fa-weight-scale me-2"></i> Peso</Link></li>

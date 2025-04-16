@@ -15,7 +15,7 @@ const MedicalDataChart = () => {
 
     //Validación para dataType
     useEffect(() => {
-        const validTypes = ['glucose', 'weight', 'blood_pressure', 'pulse'];
+        const validTypes = ['glucose', 'weight', 'bloodpressure', 'pulse'];
         if(!validTypes.includes(dataType)) {
             navigate('/statistics/glucose')// redirigir a un tipo válido si el dataType entregado no es válido
         }
@@ -54,12 +54,15 @@ const MedicalDataChart = () => {
                 }
             });
 
+            
             if (!response.ok) {
                 throw new Error(`Error al obtener datos: ${response.statusText}`);
             }
 
             const data = await response.json()
+            console.log(data)
             return data;
+            
 
         } catch (error) {
             setError(error.message);
@@ -96,8 +99,8 @@ const MedicalDataChart = () => {
                     });
                     break;
                 
-                case 'blood_pressure':
-                    const bpData = await fetchData('blood_pressure');
+                case 'bloodpressure':
+                    const bpData = await fetchData('bloodpressure');
                     formattedData = bpData.map(record => {
                         return {
                         date: formatDate(record.manual_datetime),
@@ -134,7 +137,7 @@ const MedicalDataChart = () => {
         switch (dataType) {
             case 'glucose': return ['glucosa'];
             case 'weight': return ['peso'];
-            case 'blood_pressure': return ['sistólica', 'diastólica'];
+            case 'bloodpressure': return ['sistólica', 'diastólica'];
             case 'pulse': return ['pulso'];
             default: return ['glucosa']
         }
@@ -143,7 +146,7 @@ const MedicalDataChart = () => {
      const dataTypeNames = {
         'glucose': 'Glucosa',
         'weight': 'Peso',
-        'blood_pressure': 'Tensión Arterial',
+        'bloodpressure': 'Tensión Arterial',
         'pulse': 'Pulso'
      };
     return (
