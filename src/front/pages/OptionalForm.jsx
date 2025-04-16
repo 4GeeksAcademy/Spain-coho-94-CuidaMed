@@ -427,13 +427,15 @@ function OptionalForm() {
                     Altura (mt)
                   </label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     className={`form-control form-control-lg ${errors.height ? "is-invalid" : ""}`}
                     id="height"
                     name="height"
                     value={formData.height}
                     onChange={handleChange}
                     placeholder="Ejemplo: 1.75"
+                    aria-describedby="heightHelp"
                   />
                   {errors.height && (
                     <div className="invalid-feedback ms-4">{errors.height}</div>
@@ -445,13 +447,15 @@ function OptionalForm() {
                     Peso (kg)
                   </label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     className={`form-control form-control-lg ${errors.weight ? "is-invalid" : ""}`}
                     id="weight"
                     name="weight"
                     value={formData.weight}
                     onChange={handleChange}
                     placeholder="Ejemplo: 70"
+                    aria-describedby="weightHelp"
                   />
                   {errors.weight && (
                     <div className="invalid-feedback ms-4">{errors.weight}</div>
@@ -460,12 +464,32 @@ function OptionalForm() {
 
                 {imc && (
                   <div className="alert alert-info mb-4">
-                    <strong>IMC:</strong> {imc} - {
-                      imc < 18.5 ? "Bajo peso" :
-                        imc < 25 ? "Peso normal" :
-                          imc < 30 ? "Sobrepeso" :
-                            "Obesidad"
-                    }
+                    <div className="d-flex align-items-center">
+                      <div className="me-3">
+                        <strong className="fs-5">IMC:</strong> {imc}
+                      </div>
+                      <div>
+                        <span className={`badge ${
+                          imc < 18.5 ? "bg-warning" :
+                          imc < 25 ? "bg-success" :
+                          imc < 30 ? "bg-warning" :
+                          "bg-danger"
+                        } p-2`}>
+                          {imc < 16 ? "Delgadez severa" : 
+                           imc < 17 ? "Delgadez moderada" :
+                           imc < 18.5 ? "Delgadez leve" :
+                           imc < 25 ? "Peso normal" :
+                           imc < 30 ? "Sobrepeso" :
+                           imc < 35 ? "Obesidad grado I" : 
+                           imc < 40 ? "Obesidad grado II" :
+                           "Obesidad grado III"}
+                        </span>
+                      </div>
+                    </div>
+                    <hr className="my-2" />
+                    <small>
+                      El IMC es un indicador que relaciona el peso y la altura. Se considera saludable un IMC entre 18.5 y 24.9
+                    </small>
                   </div>
                 )}
 
