@@ -66,9 +66,6 @@ def get_allergies():
         
         # Buscar todas las alergias del usuario
         allergies = Allergy.query.filter_by(user_id=current_user_id).all()
-
-        if not allergies:
-            return jsonify({"msg": "Registro de alergia no encontrado"}), 404
        
         return jsonify([
             {

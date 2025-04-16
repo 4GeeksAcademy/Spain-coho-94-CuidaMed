@@ -1,77 +1,14 @@
 import React, { useState, useEffect } from "react";
-import useGlobalReducer from "../hooks/useGlobalReducer";
-
 
 const AllergyRecords = () => {
-    const { store, dispatch } = useGlobalReducer();
+    
     const [formData, setFormData] = useState({
         allergen: "",
         symptoms: "",
         severity: "",
     }
     )
-    const [allergiesHistory, setAllergiesHistory] = useState([
-        {
-            id:1,
-            allergen: "Polen",
-            symptoms: "Congestión nasal, picor de ojos y estornudos frecuentes durante primavera.",
-            severity: "moderada"
-          },
-          {
-            id:2,
-            allergen: "Gluten",
-            symptoms: "Dolor abdominal, hinchazón y fatiga después de consumir pan o pasta.",
-            severity: "grave"
-          },
-          {
-            id:3,
-            allergen: "Lácteos",
-            symptoms: "Gases y molestias estomacales tras consumir productos lácteos.",
-            severity: "leve"
-          },
-          {
-            id:4,
-            allergen: "Mariscos",
-            symptoms: "Hinchazón de labios y urticaria tras ingerir camarones.",
-            severity: "muy grave"
-          },
-          {
-            id:5,
-            allergen: "Polvo",
-            symptoms: "Estornudos, picazón nasal y tos leve en ambientes cerrados.",
-            severity: "leve"
-          },
-          {
-            id:6,
-            allergen: "Picadura de abeja",
-            symptoms: "Inflamación localizada y dificultad para respirar tras la picadura.",
-            severity: "muy grave"
-          },
-          {
-            id:7,
-            allergen: "Medicamento: Ibuprofeno",
-            symptoms: "Erupción cutánea leve y molestias estomacales tras su consumo.",
-            severity: "moderada"
-          },
-          {
-            id:8,
-            allergen: "Frutos secos",
-            symptoms: "Cierre de garganta y dificultad para tragar al consumir nueces.",
-            severity: "grave"
-          },
-          {
-            id:9,
-            allergen: "Moho",
-            symptoms: "Congestión y ojos llorosos al estar en lugares húmedos.",
-            severity: "moderada"
-          },
-          {
-            id:10,
-            allergen: "Perfumes fuertes",
-            symptoms: "Dolor de cabeza y náuseas al exponerse a olores intensos.",
-            severity: "leve"
-          }
-    ])
+    const [allergiesHistory, setAllergiesHistory] = useState([])
 
     const [error, setError] = useState({
         form: "",
@@ -83,32 +20,42 @@ const AllergyRecords = () => {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const accessToken = localStorage.getItem("accessToken");
 
     useEffect(() => {
         const fetchRecordData = async () => {
             try {
                 
-                const response = await fetch(/* URL*/"",
+                const response = await fetch(`${backendUrl}/api/records/allergy`,
                     {
                         method: 'GET',
                         headers: {
                             "Content-Type": "application/json",
-                            // Enviamos el token a BD en el header.
-                            "Authorization": `Bearer ${store.token}`
+                            "Authorization": `Bearer ${accessToken}`
                         }
                     });
                 const data = await response.json();
+
 
                 if (!response.ok) {
                     throw new Error(data.error || "Error al obtener el historial de alergias")
                 }
 
-                setAllergiesHistory(/* data.loquesea */)
+                setAllergiesHistory(data.map(item=>
+                    ({
+                        allergen: item.allergen,
+                        symptoms: item.symptoms,
+                        severity: item.severity,
+                        recordId: item.id
+                    })
+                ))
+                
 
             } catch (error) {
-                setError(...error, { list: error.message })
+                setError({...error, list: error.message })
             }
         }
+        fetchRecordData();
     }, [])
 
 
@@ -123,7 +70,7 @@ const AllergyRecords = () => {
         }
 
         if (formData.symptoms.length > 200) {
-            newErrors.symptoms = "El valor máximo de caracteres es 200" //Actualizar con el valor máximo en la BD
+            newErrors.symptoms = "El valor máximo de caracteres es 200" 
             valid = false
         }
 
@@ -160,14 +107,20 @@ const AllergyRecords = () => {
 
         try {
             
-            /*const response = await fetch(""/*URL backend, {
+            const response = await fetch(`${backendUrl}/api/records/allergy`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // Enviamos el token a BD en el header.
-                    "Authorization": `Bearer ${store.token}`
+                    "Authorization": `Bearer ${accessToken}`
                 },
-                body: JSON.stringify(formData) //Aqui tenemos que mapear los campos del backend y frontend
+                body: JSON.stringify(
+                    {
+                        "id": formData.id,
+                        "allergen": formData.allergen,
+                        "symptoms": formData.symptoms,
+                        "severity": formData.severity,
+                    }
+                ) 
             })
 
             const data = await response.json();
@@ -175,13 +128,27 @@ const AllergyRecords = () => {
             if (!response.ok) {
                 throw new Error(data.error || "Error al crear el registro");
             }
-            */
-            setAllergiesHistory([formData, ...allergiesHistory]) //Actualizamos el estado pero hace falta el mapeo
+            
+            setAllergiesHistory([
+                {
+                    recordId:data.id,
+                    allergen:data.allergen,
+                    symptoms:data.symptoms,
+                    severity:data.severity
+                }
+                , ...allergiesHistory]) 
 
         } catch (error) {
             setError(error.data)
         } finally {
             setLoading(false)
+            setFormData(
+                {
+                    allergen:"",
+                    symptoms:"",
+                    severity:""
+                }
+            )
         }
     }
 
@@ -191,21 +158,21 @@ const AllergyRecords = () => {
 
     const handleDelete = async (recordId) => {
         try {
-            /*const response = await fetch(/* backend_url con el id del record"",
+            const response = await fetch(`${backendUrl}/api/records/allergy/${recordId}`,
                 {
                     method: 'DELETE',
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${store.token}`
+                        "Authorization": `Bearer ${accessToken}`
                     }
                 }
             )
             if (!response.ok) throw new Error("Error al eliminar el registro");
-            */
-            setAllergiesHistory(allergiesHistory.filter((record)=> record.id !== recordId ))
+            
+            setAllergiesHistory(allergiesHistory.filter((record)=> record.recordId !== recordId ))
             
         } catch (error) {
-            setError(...error,{ list: error.message })
+            setError({...error, list: error.message })
         }
 
     }
@@ -282,7 +249,7 @@ const AllergyRecords = () => {
                     <div className="card me-2 h-100">
                         <h5 className="card-header bg-primary text-white">Registro de alergias</h5>
                         {error.list && (
-                            <div className="alert alert-danger mb-4" role="alert">
+                            <div className="alert alert-danger m-2" role="alert">
                                 {error.list}
                             </div>
                         )}
@@ -297,11 +264,11 @@ const AllergyRecords = () => {
                                 <tbody>
                                     {allergiesHistory && allergiesHistory.slice((currentPage - 1) * 4, currentPage * 4).map((data) => {
                                         return (
-                                            <tr key={data.id}>
+                                            <tr key={data.recordId}>
                                                 <td >{data.allergen}</td>
                                                 <td >{data.symptoms}</td>
                                                 <td >{data.severity}</td>
-                                                <td><button className="btn" onClick={()=>handleDelete(data.id)}><i className="text-danger fa-solid fa-trash"></i></button></td>
+                                                <td><button className="btn" onClick={()=>handleDelete(data.recordId)}><i className="text-danger fa-solid fa-trash"></i></button></td>
                                             </tr>
                                         )
                                     })}
