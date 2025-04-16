@@ -32,21 +32,27 @@ const PersonalAntecedentRecords= () => {
                             "Authorization": `Bearer ${accessToken}`
                         }
                     });
-                const data = await response.json();
+                const result = await response.json();
+                console.log("Resultado del fetch:", result);
 
                 if (!response.ok) {
                     throw new Error(data.error || "Error al obtener el historial de antecedentes personales")
                 }
 
-                setPersonalAntecedent(
-                    data.map(item => 
+                if (!Array.isArray(result)) {
+                    setPersonalAntecedent([]);
+                    return;
+                }
+
+                const formattedData = result.map(item => 
                         ({
                             recordId:item.id,
                             disease: item.disease,
                             diagnosisDate: item.diagnosis_date,
-                        })
+                        }
                     )
                 )
+                setPersonalAntecedent(formattedData)
 
             } catch (error) {
                 setError({...error, list: error.message })
@@ -118,7 +124,7 @@ const PersonalAntecedentRecords= () => {
                 body: JSON.stringify(
                     {
                      disease:formData.disease,
-                     diagnosisDate:formData.diagnosisDate
+                     diagnosis_date:formData.diagnosisDate
                      ? formattedDate
                      : "",
                     }
@@ -132,12 +138,23 @@ const PersonalAntecedentRecords= () => {
                 throw new Error(data.error || "Error al crear el registro");
             }
             
-            setPersonalAntecedent([formData, ...personalAntecedent]) 
+            setPersonalAntecedent([
+                {
+                    recordId:data.id,
+                    disease: data.disease,
+                    diagnosisDate:data.diagnosis_date
+
+                }, 
+                ...personalAntecedent]) 
 
         } catch (error) {
             setError(error.data)
         } finally {
             setLoading(false)
+            setFormData({
+                disease:"",
+                diagnosisDate:""
+            })
         }
     }
 
@@ -147,21 +164,21 @@ const PersonalAntecedentRecords= () => {
 
     const handleDelete = async (recordId) => {
         try {
-            /*const response = await fetch(/* backend_url con el id del record"",
+            const response = await fetch( `${backendUrl}/api/records/personal_antecedents/${recordId}`,
                 {
                     method: 'DELETE',
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${store.token}`
+                        "Authorization": `Bearer ${accessToken}`
                     }
                 }
             )
             if (!response.ok) throw new Error("Error al eliminar el registro");
-            */
-            setPersonalAntecedent(personalAntecedent.filter((record)=> record.id !== recordId ))
+            
+            setPersonalAntecedent(personalAntecedent.filter((record)=> record.recordId !== recordId ))
             
         } catch (error) {
-            setError(...error,{ list: error.message })
+            setError({...error, list: error.message })
         }
 
     }
@@ -215,7 +232,7 @@ const PersonalAntecedentRecords= () => {
                     <div className="card me-2 h-100">
                         <h5 className="card-header bg-primary text-white">Historial de antecedentes</h5>
                         {error.list && (
-                            <div className="alert alert-danger mb-4" role="alert">
+                            <div className="alert alert-danger m-2" role="alert">
                                 {error.list}
                             </div>
                         )}
@@ -231,10 +248,10 @@ const PersonalAntecedentRecords= () => {
                                 <tbody>
                                     {personalAntecedent && personalAntecedent.slice((currentPage - 1) * 7, currentPage * 7).map((data) => {
                                         return (
-                                            <tr key={data.id}>
+                                            <tr key={data.recordId}>
                                                 <td>{data.disease}</td>
                                                 <td>{data.diagnosisDate}</td>
-                                                <td><button className="btn" onClick={()=>handleDelete(data.id)}><i className="text-danger fa-solid fa-trash"></i></button></td>
+                                                <td><button className="btn" onClick={()=>handleDelete(data.recordId)}><i className="text-danger fa-solid fa-trash"></i></button></td>
                                             </tr>
                                         )
                                     })}
