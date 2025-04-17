@@ -10,11 +10,12 @@ from api.models import db
 from api.routes import api
 from api.auth.routes import auth_bp
 from api.users.routes import users_bp
+from api.gallery.routes import gallery_bp
 from api.records import records_blueprint
 from api.admin import setup_admin
 from api.commands import setup_commands
 from flask_cors import CORS
-
+import os
 from flask_jwt_extended import JWTManager
 import datetime
 
@@ -53,13 +54,20 @@ app.register_blueprint(users_bp, url_prefix='/api/users')
 
 app.register_blueprint(records_blueprint, url_prefix='/api/records')
 
+app.register_blueprint(gallery_bp, url_prefix='/api/gallery')
+
 # Configuración del JWT
 app.config["JWT_SECRET_KEY"] = "clave-super-secreta"
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(hours=12)
 app.config["JWT_TOKEN_LOCATION"] = ["headers"]
 app.config["JWT_HEADER_NAME"] = "Authorization"
 app.config["JWT_HEADER_TYPE"] = "Bearer"
+
 jwt = JWTManager(app)
+
+
+# Configurar clave secreta
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 
 # Allow CORS requests to this API
 CORS(app)
