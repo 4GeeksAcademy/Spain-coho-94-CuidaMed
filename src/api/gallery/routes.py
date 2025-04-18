@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User
+from api.models import db, User, GalleryImage
+from datetime import datetime
 from api.utils import APIException
 from flask_cors import CORS
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity
 import os
 import secrets
 from google.oauth2 import id_token
@@ -11,6 +12,7 @@ import boto3
 from botocore.client import Config
 import uuid
 import os
+
 
 gallery_bp = Blueprint('gallery', __name__)
 
@@ -78,7 +80,7 @@ response = svc.upload_file('getting-started.py', 'tigris-example', 'getting-star
 # Download file
 response = svc.download_file('tigris-example', 'getting-started.py', 'getting-started-2.py')"""
 
-#Esta ruta es para comprobar que se esta subiendo la imagen a TigrisDB
+#Esta ruta es para comprobar que se esta subiendo la imagen a TigrisDB (Funcionando)
 @gallery_bp.route("/test", methods=["POST"])
 def testing_tigris():
     try:
@@ -96,3 +98,50 @@ def testing_tigris():
         return jsonify({"error": str(e)}), e.status_code
     except Exception as e:
         return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
+    
+
+@gallery_bp.route("/", methods=["POST"])
+@jwt_required()
+def upload_gallery_image():
+
+    current_user_id = get_jwt_identity()
+
+    user= User.query.get(current_user_id)
+    if not user:
+        return jsonify({'msg': 'Usuario no encontrado'}), 404
+    
+    # obtener datos del formulario
+    data= request.form
+
+    # verificar camos requeridos
+    if not data.get('title') or not data.get('category') or not data.get('manual_datetime'):
+        return jsonify ({'msg': 'Faltan campos requeridos'}), 400
+
+    # verificar si hay archivo en solicitud
+    image_file = request.files.get('image')
+    if not image_file:
+        return jsonify ({'msg':'No se proporciono ninguna imagen'}), 400
+
+    # subir imagen a TigrisDB
+    image_url = upload_image_to_tigris(image_file, "cuidamed2")
+    if not image_url:
+        return jsonify({'msg': 'Error al subir imagen a tigris'}), 500
+    
+    try:
+        
+      new_image = GalleryImage(
+        user_id=current_user_id,
+        title=data.get('title'),
+        manual_datetime=datetime.strptime(data['manual_datetime'], "%d-%m-%Y %H:%M"),
+        category= data.get('category'),
+        image_url=image_url
+      )
+
+      db.session.add(new_image)
+      db.session.commit()
+
+      return jsonify({'msg': 'Imagen subida correctamente'}), 201
+
+    except Exception as e:
+            db.session.rollback()
+            return jsonify({"msg": "Error al subir imagen", "error": str(e)}), 500
