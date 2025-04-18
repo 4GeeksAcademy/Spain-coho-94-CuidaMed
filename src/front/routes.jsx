@@ -26,6 +26,8 @@ import Dashboard from "./pages/Dashboard";
 import { LayoutPrivate } from "./pages/LayoutPrivate";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -67,6 +69,8 @@ export const router = createBrowserRouter(
 
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
+      <Route path="/forgotpassword" element={<ForgotPassword />} />
+      <Route path="/resetpassword/:token" element={<ResetPassword/>}/>
       <Route path="/*" element={<h1>No se ha encontrado la página</h1>} />
     </>
   )
