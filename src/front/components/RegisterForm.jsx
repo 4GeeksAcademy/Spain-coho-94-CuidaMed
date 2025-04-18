@@ -176,7 +176,6 @@ export default function RegisterForm() {
                   "Crear cuenta"
                   )}
               </button>
-              <button onClick={()=>{navigate("/resetpassword/ImZlcm1pbjE5OTZAZ21haWwuY29tIg.aAI7ZQ.1xzEQhK1Wj5i5Yi-3vGUz6i-WLg")}}>Test</button>
 
               <div className="d-flex align-items-center my-3">
                   <hr className="flex-grow-1" />

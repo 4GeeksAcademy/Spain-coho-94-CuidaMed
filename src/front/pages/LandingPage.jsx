@@ -1,15 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import medicalform from "../assets/img/medical-enrollment-form-document-medicare-concept.jpeg"
 
 const LandingPage = () => {
-    console.log("Renderizando Landing page")
     return (
         <div className="d-flex flex-column min-vh-100">
             {/* Hero Section */}
             <section className="position-relative bg-light" style={{ minHeight: "70vh" }}>
                 <div className="position-absolute top-0 start-0 w-100 h-100">
                     <img
-                        src="src/front/assets/img/medical-enrollment-form-document-medicare-concept.jpeg"
+                        src={medicalform}
                         alt="Formulario de registro en el ordenador"
                         className="img-fluid w-100 h-100 object-fit-cover"
                     />
