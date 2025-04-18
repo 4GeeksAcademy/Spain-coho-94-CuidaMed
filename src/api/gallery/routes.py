@@ -78,6 +78,7 @@ response = svc.upload_file('getting-started.py', 'tigris-example', 'getting-star
 # Download file
 response = svc.download_file('tigris-example', 'getting-started.py', 'getting-started-2.py')"""
 
+#Esta ruta es para comprobar que se esta subiendo la imagen a TigrisDB
 @gallery_bp.route("/test", methods=["POST"])
 def testing_tigris():
     try:
