@@ -56,7 +56,7 @@ const ForgotForm = () => {
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
 
-      /*const response = await fetch(`${backendUrl}/api/auth/forgot-password`, {
+      const response = await fetch(`${backendUrl}/api/auth/forgot-password`, {
           method:"POST",
           headers:{
             "Content-Type": "application/json",
@@ -70,7 +70,7 @@ const ForgotForm = () => {
           throw new Error("Error al enviar correo de recuperación de contraseña")
       }
 
-      const data = await response.json()*/
+      const data = await response.json()
 
       setFormData({...formData, infoMessage: true})
       
@@ -136,6 +136,7 @@ const ForgotForm = () => {
               <div className="w-100 d-flex justify-content-center">
                 <a href="/login" className="text-decoration-none">Volver al login</a>
               </div>
+              
 
               <div className="text-center mt-2">
                   <p className="text-muted mb-0">

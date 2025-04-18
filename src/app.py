@@ -14,6 +14,7 @@ from api.records import records_blueprint
 from api.admin import setup_admin
 from api.commands import setup_commands
 from flask_cors import CORS
+from extensions import mail
 
 from flask_jwt_extended import JWTManager
 import datetime
@@ -64,6 +65,16 @@ jwt = JWTManager(app)
 # Allow CORS requests to this API
 CORS(app)
 
+# Configuración del email para restablecer contraseña
+app.config['MAIL_SERVER'] = os.getenv("MAIL_SERVER")
+app.config['MAIL_PORT'] = os.getenv("MAIL_PORT")
+app.config['MAIL_USE_TLS'] = os.getenv("MAIL_USE_TLS") == 'True'
+app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
+app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")  # Para generar el token
+
+# Inicializar extensión de Mail
+mail.init_app(app)
 
 # Handle/serialize errors like a JSON object
 #Tengamos algún cambio
@@ -98,3 +109,4 @@ def serve_any_other_file(path):
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
     app.run(host='0.0.0.0', port=PORT, debug=True)
+
