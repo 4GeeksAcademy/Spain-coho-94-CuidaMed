@@ -8,7 +8,7 @@ import { BackendURL } from './components/BackendURL';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const Main = () => {
-    
+    console.log("Renderizando Main")
     if(! import.meta.env.VITE_BACKEND_URL ||  import.meta.env.VITE_BACKEND_URL == "") return (
         <React.StrictMode>
               <BackendURL/ >

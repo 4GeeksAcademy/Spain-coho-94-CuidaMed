@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const LandingPage = () => {
+    console.log("Renderizando Landing page")
     return (
         <div className="d-flex flex-column min-vh-100">
             {/* Hero Section */}
