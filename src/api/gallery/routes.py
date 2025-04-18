@@ -118,11 +118,12 @@ def upload_gallery_image():
     if not data.get('title') or not data.get('category') or not data.get('manual_datetime'):
         return jsonify ({'msg': 'Faltan campos requeridos'}), 400
 
+    
     # verificar si hay archivo en solicitud
     image_file = request.files.get('image')
     if not image_file:
         return jsonify ({'msg':'No se proporciono ninguna imagen'}), 400
-
+    
     # subir imagen a TigrisDB
     image_url = upload_image_to_tigris(image_file, "cuidamed2")
     if not image_url:
@@ -141,7 +142,14 @@ def upload_gallery_image():
       db.session.add(new_image)
       db.session.commit()
 
-      return jsonify({'msg': 'Imagen subida correctamente'}), 201
+      return jsonify({
+            'msg': 'Imagen subida correctamente',
+            'id': new_image.id,
+            'title': new_image.title,
+            'manual_datetime': new_image.manual_datetime.strftime("%d-%m-%Y") if new_image.manual_datetime else None,
+            'category': new_image.category,
+            'image_url': new_image.image_url
+        }), 201
 
     except Exception as e:
             db.session.rollback()

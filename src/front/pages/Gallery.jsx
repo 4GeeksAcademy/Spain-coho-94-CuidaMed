@@ -38,14 +38,49 @@ const Gallery = () => {
     const [selectedCategory, setSelectedCategory] = useState("")
     const [showUploadModal, setShowUploadModal] = useState(false)
     const [filteredImages, setFilteredImages] = useState([])
-    const [imageHistory, setImageHistory] = useState(sampleImages)
+    const [imageHistory, setImageHistory] = useState([])
+    const [uploadForm, setUploadForm] = useState({
+      title: "",
+      category: "",
+      date: "",
+      file: null
+    });
 
     const categories = ["Radiografía", "Analítica", "Documento"]
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const accessToken = localStorage.getItem("accessToken");
 
     useEffect(()=>{
-        //Aquí hacemos el GET  de la la base de datos y la API cuando cargue la página
-        setImageHistory(sampleImages)
+        const fetchImages = async () => {
+          try {
+            const response = await fetch(`${backendUrl}/api/gallery`, {
+              method: 'GET',
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${accessToken}`
+              }
+            });
 
+            const data = await response.json();
+
+            if(!response.ok){
+              throw new Error(data.error || " Error al obtener las imágenes")
+            }
+
+            setImageHistory(
+              data.images.map(img => ({
+                id: img.id,
+                title: img.title,
+                category: img.category,
+                date: img.manual_datetime,
+                url: img.image_url
+              })));
+
+          } catch (error) {
+            console.error("Error al cargar imágenes:", error.message);
+          }
+        }
+        fetchImages()
     },[]);
 
     useEffect(()=>{
@@ -55,8 +90,69 @@ const Gallery = () => {
             return matchesSearch && matchesCategory
         }))
     }
-    ,[searchTerm, selectedCategory])
+    ,[searchTerm, selectedCategory, imageHistory])
     
+    const handleUploadChange = (e) => {
+      const { name, value, files } = e.target;
+      setUploadForm(prev => ({
+        ...prev,
+        [name]: files ? files[0] : value
+      }));
+    };
+    
+    const formatDatetime = (datetimeStr) => {
+      const dateObj = new Date(datetimeStr);
+      const day = String(dateObj.getDate()).padStart(2, "0");
+      const month = String(dateObj.getMonth() + 1).padStart(2, "0"); // enero = 0
+      const year = dateObj.getFullYear();
+      const hours = String(dateObj.getHours()).padStart(2, "0");
+      const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+    
+      return `${day}-${month}-${year} ${hours}:${minutes}`;
+    }
+
+    const handleUpload = async () => {
+      
+      const formattedDate = formatDatetime(uploadForm.date)
+      
+      const formData = new FormData();
+      formData.append("title", uploadForm.title);
+      formData.append("category", uploadForm.category);
+      formData.append("manual_datetime", formattedDate);
+      formData.append("image", uploadForm.file);
+      
+      try {
+        const response = await fetch(`${backendUrl}/api/gallery`,{
+          method:'POST',
+          headers: {
+            "Authorization": `Bearer ${accessToken}`
+          },
+          body: formData
+
+        })
+
+        const data = await response.json();
+
+        if(!response.ok){
+          throw new Error(data.error)
+        }
+
+        setShowUploadModal(false);
+        setUploadForm({ title: "", category: "", date: "", file: null });
+        setImageHistory(prev => [
+          {
+            id: data.id, 
+            title: data.title,
+            category: data.category,
+            date: uploadForm.date,
+            url: data.image_url 
+          },
+          ...prev
+        ]);
+      } catch (error) {
+        console.log(`Error al subir la imagen: ${error.message}`)
+      }
+    }
 
   return (
     <div className="container py-4">
@@ -153,14 +249,27 @@ const Gallery = () => {
                     <label htmlFor="imageTitle" className="form-label">
                       Título
                     </label>
-                    <input type="text" className="form-control" id="imageTitle" />
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      id="imageTitle"
+                      name="title"
+                      value={uploadForm.title}
+                      onChange={handleUploadChange}
+                      />
                   </div>
 
                   <div className="mb-3">
                     <label htmlFor="imageCategory" className="form-label">
                       Categoría
                     </label>
-                    <select className="form-select" id="imageCategory">
+                    <select 
+                      className="form-select" 
+                      id="imageCategory"
+                      name="category"
+                      value={uploadForm.category}
+                      onChange={handleUploadChange}
+                      >
                       <option value="">Seleccionar categoría...</option>
                       {categories.map((category) => (
                         <option key={category} value={category}>
@@ -174,14 +283,27 @@ const Gallery = () => {
                     <label htmlFor="imageDate" className="form-label">
                       Fecha
                     </label>
-                    <input type="date" className="form-control" id="imageDate" />
+                    <input 
+                      type="date" 
+                      className="form-control" 
+                      id="imageDate"
+                      name="date"
+                      value={uploadForm.date}
+                      onChange={handleUploadChange}
+                      />
                   </div>
 
                   <div className="mb-3">
                     <label htmlFor="imageFile" className="form-label">
                       Archivo
                     </label>
-                    <input type="file" className="form-control" id="imageFile" />
+                    <input 
+                      type="file" 
+                      className="form-control" 
+                      id="imageFile" 
+                      name="file"
+                      onChange={handleUploadChange}
+                      />
                   </div>
                 </form>
               </div>
@@ -189,10 +311,10 @@ const Gallery = () => {
                 <button type="button" className="btn btn-secondary" onClick={() => setShowUploadModal(false)}>
                   Cancelar
                 </button>
-                <button type="button" className="btn btn-primary">
+                <button type="button" className="btn btn-primary" onClick={handleUpload}>
                   Subir
                 </button>
-                {/* Pendiente hacer el POST a base de datos y API */}
+                
               </div>
             </div>
           </div>
