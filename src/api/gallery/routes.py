@@ -100,6 +100,7 @@ def testing_tigris():
         return jsonify({"error": f"Error inesperado: {str(e)}"}), 500
     
 
+#Rutas para la base de datos "GalleryImage"
 @gallery_bp.route("/", methods=["POST"])
 @jwt_required()
 def upload_gallery_image():
@@ -165,6 +166,53 @@ def get_gallery_image():
         'total': len(result),
         'images': result
     }), 200
+
+
+@gallery_bp.route("/<int:image_id>", methods=["DELETE"])
+@jwt_required()
+def delete_gallery_image(image_id):
+    # Elimina una imagen de la galería por su ID en la base de datos
+    try:
+        current_user_id = get_jwt_identity()
+        
+        gallery_image = GalleryImage.query.get(image_id)
+        
+        if not gallery_image:
+            return jsonify({"msg": "Imagen no encontrada"}), 404
+            
+        if str(gallery_image.user_id) != str(current_user_id):
+            return jsonify({"msg": "No tienes permiso para eliminar esta imagen"}), 403
+        
+        # Variable para guardar advertencias
+        warning = None
+        
+        # Código para eliminar el archivo de TigrisDB
+        try:
+            # Extraer el nombre del archivo de la URL
+            image_filename = gallery_image.image_url.split('/')[-1]
+            bucket_name = "cuidamed2"
+            
+            # Eliminar el archivo de Tigris
+            svc.delete_object(
+                Bucket=bucket_name,
+                Key=image_filename
+            )
+        except Exception as e:
+            # Guardar el error para usarlo después
+            warning = f"La imagen se eliminó de la base de datos, pero hubo un problema al eliminarla del almacenamiento: {str(e)}"
+        
+        # Eliminar el registro de la base de datos
+        db.session.delete(gallery_image)
+        db.session.commit()
+        
+        if warning:
+            return jsonify({"msg": warning}), 200
+        else:
+            return jsonify({"msg": "Imagen eliminada correctamente"}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": f"Error al eliminar la imagen: {str(e)}"}), 500
 
 
 
