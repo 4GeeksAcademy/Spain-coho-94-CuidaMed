@@ -94,7 +94,7 @@ def sitemap():
 
 # any other endpoint will try to serve it like a static file
 
-
+@app.route('/', defaults={'path': ''})
 @app.route('/<path:path>', methods=['GET'])
 def serve_any_other_file(path):
     if not os.path.isfile(os.path.join(static_file_dir, path)):
