@@ -36,7 +36,7 @@ def upload_image_to_tigris(file, bucket_name):
     extension = os.path.splitext(original_filename)[1].lower()
     
     # Verificar que la extensión sea válida
-    allowed_extensions = ['.jpg', '.jpeg', '.png']
+    allowed_extensions = ['.jpg', '.jpeg', '.png', '.pdf']
     if extension not in allowed_extensions:
         raise APIException(f"Formato de archivo no permitido. Use: {', '.join(allowed_extensions)}", status_code=400)
     
@@ -145,3 +145,26 @@ def upload_gallery_image():
     except Exception as e:
             db.session.rollback()
             return jsonify({"msg": "Error al subir imagen", "error": str(e)}), 500
+    
+@gallery_bp.route("/", methods=["GET"])
+@jwt_required()
+def get_gallery_image():
+
+    current_user_id = get_jwt_identity()
+
+    user = User.query.get(current_user_id)
+    if not user:
+        return jsonify ({'msg': 'Usuario no encotrado'}), 404
+    
+    gallery_images = GalleryImage.query.filter_by(user_id=current_user_id).order_by(GalleryImage.manual_datetime.desc()).all()
+
+    result = [image.serialize_gallery_image() for image in gallery_images]
+
+    return jsonify({
+        'msg': 'Imágenes obtenidas correctamente',
+        'total': len(result),
+        'images': result
+    }), 200
+
+
+
