@@ -126,15 +126,12 @@ const MedicalDataChart = () => {
                     break;
             }
             // Función que transforma un string DD/MM/YYYY a un objeto Date
-            const parseDate = (dateStr) => {
-                const [day, month, year] = dateStr.split('/')
-                return new Date(year, month - 1, day)
-            }
-            // Ordenar por fecha el formattedData
+           
             const parseDate = (dateStr) => {
                 const [day, month, year] = dateStr.split('/');
                 return new Date(year, month - 1, day);
             };
+             // Ordenar por fecha el formattedData
             formattedData.sort((a, b) => parseDate(a.date) - parseDate(b.date));
             setPatientData(formattedData)
         };
