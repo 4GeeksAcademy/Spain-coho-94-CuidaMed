@@ -1,42 +1,15 @@
 import React, { useState, useEffect } from "react";
-import useGlobalReducer from "../hooks/useGlobalReducer";
 
 
-const MedicalHistoryRecords
- = () => {
-    const { store, dispatch } = useGlobalReducer();
+
+const MedicalHistoryRecords = () => {
+    
     const [formData, setFormData] = useState({
         kinship: "",
         disease: "",
     }
     )
-    const [medicalHistory, setMedicalHistory] = useState([
-        { id: 1, kinship: "Padre", disease: "Hipertensión" },
-        { id: 2, kinship: "Madre", disease: "Diabetes tipo 2" },
-        { id: 3, kinship: "Abuelo paterno", disease: "Enfermedad coronaria" },
-        { id: 4, kinship: "Abuela materna", disease: "Osteoporosis" },
-        { id: 5, kinship: "Hermano", disease: "Asma" },
-        { id: 6, kinship: "Hermana", disease: "Alergia alimentaria" },
-        { id: 7, kinship: "Tío materno", disease: "Cáncer de colon" },
-        { id: 8, kinship: "Tía paterna", disease: "Hipotiroidismo" },
-        { id: 9, kinship: "Abuelo materno", disease: "Diabetes tipo 2" },
-        { id: 10, kinship: "Abuela paterna", disease: "Alzheimer" },
-        { id: 11, kinship: "Padre", disease: "Colesterol alto" },
-        { id: 12, kinship: "Madre", disease: "Cáncer de mama" },
-        { id: 13, kinship: "Hermano", disease: "Enfermedad celíaca" },
-        { id: 14, kinship: "Hermana", disease: "Migrañas crónicas" },
-        { id: 15, kinship: "Tío paterno", disease: "Enfermedad renal crónica" },
-        { id: 16, kinship: "Tía materna", disease: "Esclerosis múltiple" },
-        { id: 17, kinship: "Primo", disease: "Trastorno bipolar" },
-        { id: 18, kinship: "Prima", disease: "Asma" },
-        { id: 19, kinship: "Padre", disease: "Artritis reumatoide" },
-        { id: 20, kinship: "Madre", disease: "Glaucoma" },
-        { id: 21, kinship: "Abuelo paterno", disease: "Cáncer de próstata" },
-        { id: 22, kinship: "Abuela materna", disease: "Hipertensión" },
-        { id: 23, kinship: "Tía paterna", disease: "Diabetes tipo 1" },
-        { id: 24, kinship: "Hermano", disease: "Epilepsia" },
-        { id: 25, kinship: "Primo", disease: "Trastorno por déficit de atención" },
-    ])
+    const [medicalHistory, setMedicalHistory] = useState([ ])
 
     const [error, setError] = useState({
         form: "",
@@ -47,18 +20,18 @@ const MedicalHistoryRecords
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const accessToken = localStorage.getItem("accessToken");
 
     useEffect(() => {
         const fetchRecordData = async () => {
             try {
                 
-                const response = await fetch(/* URL*/"",
+                const response = await fetch(`${backendUrl}/api/records/medical_history`,
                     {
                         method: 'GET',
                         headers: {
                             "Content-Type": "application/json",
-                            // Enviamos el token a BD en el header.
-                            "Authorization": `Bearer ${store.token}`
+                            "Authorization": `Bearer ${accessToken}`
                         }
                     });
                 const data = await response.json();
@@ -67,12 +40,19 @@ const MedicalHistoryRecords
                     throw new Error(data.error || "Error al obtener el historial de antecedentes familiares")
                 }
 
-                setMedicalHistory(/* data.loquesea */)
+                setMedicalHistory(data.map(item => 
+                    ({
+                    recordId:item.id,
+                    kinship: item.kinship,
+                    disease: item.disease,
+                    })
+                ))
 
             } catch (error) {
-                setError(...error, { list: error.message })
+                setError({...error, list: error.message })
             }
         }
+        fetchRecordData();
     }, [])
 
 
@@ -124,14 +104,18 @@ const MedicalHistoryRecords
 
         try {
             
-            /*const response = await fetch(""/*URL backend, {
+            const response = await fetch(`${backendUrl}/api/records/medical_history`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // Enviamos el token a BD en el header.
-                    "Authorization": `Bearer ${store.token}`
+                    "Authorization": `Bearer ${accessToken}`
                 },
-                body: JSON.stringify(formData) //Aqui tenemos que mapear los campos del backend y frontend
+                body: JSON.stringify(
+                    {
+                        'kinship': formData.kinship,
+                        'disease': formData.disease 
+                    }
+                )
             })
 
             const data = await response.json();
@@ -139,13 +123,23 @@ const MedicalHistoryRecords
             if (!response.ok) {
                 throw new Error(data.error || "Error al crear el registro");
             }
-            */
-            setMedicalHistory([formData, ...medicalHistory]) //Actualizamos el estado pero hace falta el mapeo
+            
+            setMedicalHistory([
+                {
+                    kinship:data.kinship,
+                    disease:data.disease,
+                    recordId:data.id
+                }, 
+                ...medicalHistory]) 
 
         } catch (error) {
             setError(error.data)
         } finally {
             setLoading(false)
+            setFormData({
+                kinship:"",
+                disease:""
+            })
         }
     }
 
@@ -155,21 +149,21 @@ const MedicalHistoryRecords
 
     const handleDelete = async (recordId) => {
         try {
-            /*const response = await fetch(/* backend_url con el id del record"",
+            const response = await fetch( `${backendUrl}/api/records/medical_history/${recordId}`,
                 {
                     method: 'DELETE',
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${store.token}`
+                        "Authorization": `Bearer ${accessToken}`
                     }
                 }
             )
             if (!response.ok) throw new Error("Error al eliminar el registro");
-            */
-            setMedicalHistory(medicalHistory.filter((record)=> record.id !== recordId ))
+            
+            setMedicalHistory(medicalHistory.filter((record)=> record.recordId !== recordId ))
             
         } catch (error) {
-            setError(...error,{ list: error.message })
+            setError({...error, list: error.message })
         }
 
     }
@@ -225,7 +219,7 @@ const MedicalHistoryRecords
                     <div className="card me-2 h-100">
                         <h5 className="card-header bg-primary text-white">Historial de antecedentes</h5>
                         {error.list && (
-                            <div className="alert alert-danger mb-4" role="alert">
+                            <div className="alert alert-danger m-2" role="alert">
                                 {error.list}
                             </div>
                         )}
@@ -241,10 +235,10 @@ const MedicalHistoryRecords
                                 <tbody>
                                     {medicalHistory && medicalHistory.slice((currentPage - 1) * 7, currentPage * 7).map((data) => {
                                         return (
-                                            <tr key={data.id}>
+                                            <tr key={data.recordId}>
                                                 <td >{data.kinship}</td>
                                                 <td >{data.disease}</td>
-                                                <td><button className="btn" onClick={()=>handleDelete(data.id)}><i className="text-danger fa-solid fa-trash"></i></button></td>
+                                                <td><button className="btn" onClick={()=>handleDelete(data.recordId)}><i className="text-danger fa-solid fa-trash"></i></button></td>
                                             </tr>
                                         )
                                     })}

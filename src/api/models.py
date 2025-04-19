@@ -43,6 +43,7 @@ class User(db.Model):
         back_populates="user", cascade="all, delete-orphan")
     glucose_history: Mapped[List["Glucose"]] = relationship(
         back_populates="user", cascade="all, delete-orphan")
+    gallery_images = relationship("GalleryImage", back_populates="user", cascade="all, delete-orphan")
 
     # Constructor para la clase User que inicializa con email y password
 
@@ -443,3 +444,35 @@ class Glucose(db.Model):
             'comments': self.comments,
             'manual_datetime': self.manual_datetime.strftime("%d-%m-%Y %H:%M") if self.manual_datetime else None
         }
+
+class GalleryImage(db.Model):
+    __tablename__ = 'gallery_images'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey('users.id'), nullable=False)
+    title: Mapped[str] = mapped_column(String(300), nullable=False)
+    manual_datetime: Mapped[datetime] = mapped_column(
+        DateTime(), nullable=False)
+    category: Mapped[str] = mapped_column(String(150), nullable=False)
+    image_url:Mapped[str] = mapped_column(String(500), nullable=False)
+
+    # Relacion con el usuario
+    user = relationship("User", back_populates="gallery_images")
+
+    def serialize_gallery_image(self):
+
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'title': self.title,
+            'manual_datetime': self.manual_datetime.strftime("%d-%m-%Y %H:%M") if self.manual_datetime else None,
+            'category': self.category,
+            'image_url': self.image_url
+        }
+
+
+
+
+
+    

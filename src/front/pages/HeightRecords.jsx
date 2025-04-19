@@ -45,7 +45,7 @@ const HeightRecords = () => {
                 setHeightHistory(data.map(item => 
                     ({
                         recordId:item.id,
-                        glucoseValue:item.height,
+                        heightValue:item.height,
                         measurementDate: item.manual_datetime, 
                         comments:item.comments
                     })
