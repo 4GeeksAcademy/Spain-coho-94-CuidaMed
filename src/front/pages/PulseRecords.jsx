@@ -256,7 +256,10 @@ const PulseRecords = () => {
                                     />
                                     {error.comments && <div className="invalid-feedback">{error.comments}</div>}
                                 </div>
-                                <button type="submit" className="btn btn-primary">Añadir registro</button>
+                                <div className="d-flex w-100 justify-content-end">
+                                    <button type="submit" className="btn btn-primary">Añadir registro</button>
+                                </div>
+                                
                             </form>
 
                         </div>

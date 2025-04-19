@@ -28,8 +28,10 @@ const EmergencyContact = () => {
         emailContact: "",
     });
     const [loading, setLoading] = useState(true);
+    const [buttonLabel, setButtonLabel] = useState("Añadir contacto")
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const accessToken = localStorage.getItem("accessToken");
+    
 
     useEffect(() => {
         const fetchRecordData = async () => {
@@ -57,6 +59,14 @@ const EmergencyContact = () => {
                     emailContact: data.email_contact
                 })
 
+                setFormData({
+                    firstNameContact: data.first_name_contact,
+                    lastNameContact: data.last_name_contact,
+                    relationshipType:data.relationship_type,
+                    phoneContact:data.phone_contact,
+                    emailContact: data.email_contact                  
+                })
+                setButtonLabel("Modificar contacto")
             } catch (error) {
                 setError({...error, list: error.message })
             }
@@ -181,13 +191,6 @@ const EmergencyContact = () => {
             setError({...error, form: error.message })
         } finally {
             setLoading(false)
-            setFormData({
-                firstNameContact: "",
-                lastNameContact: "",
-                relationshipType:"",
-                phoneContact:"",
-                emailContact: "",
-            })
         }
     }
 
@@ -309,7 +312,10 @@ const EmergencyContact = () => {
                                     />
                                     {error.emailContact && <div className="invalid-feedback">{error.emailContact}</div>}
                                 </div>
-                                <button type="submit" className="btn btn-primary">Añadir contacto</button>
+                                <div className="d-flex w-100 justify-content-end">
+                                    <button type="submit" className="btn btn-primary">{buttonLabel}</button>  
+                                </div>
+                                
                             </form>
 
                         </div>
