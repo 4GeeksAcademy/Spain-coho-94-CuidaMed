@@ -41,7 +41,7 @@ def user_dashboard():
         except Exception as e:
             # Registrar el error pero continuar con el resto de consultas
             print(f"Error al obtener la tensión arterial: {str(e)}")
-            # Opcionalmente, podrías agregar un logger más sofisticado aquí
+            
             
         # Obtener última glucosa
         try:

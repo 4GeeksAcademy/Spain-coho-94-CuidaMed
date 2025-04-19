@@ -28,7 +28,7 @@ const LandingPage = () => {
                                 control de tu bienestar con nuestra plataforma gratuita de
                                 gestión de salud.
                             </p>
-                            <Link to="/register" className="btn btn-primary btn-lg mt-3">
+                            <Link to="/signup" className="btn btn-primary btn-lg mt-3">
                                 Pruébalo gratis <i className="fas fa-arrow-right ms-2"></i>
                             </Link>
                         </div>

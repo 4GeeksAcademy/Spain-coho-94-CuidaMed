@@ -12,13 +12,13 @@ const RecentRecords = ({lastBloodPressure, lastGlucose, lastWeight}) => {
         <div className="card-body">
             <div className="list-group">
                 <Link
-                    to="/records/blood-pressure"
+                    to="/records/bloodpressure"
                     className="list-group-item list-group-item-action d-flex align-items-center"
                 >
                     <i className="fas fa-heart me-3 text-danger" style={{ fontSize: '18px' }}></i>
                     <div className="w-100">
                         <h6 className="mb-1">Tensión Arterial</h6>
-                        {lastBloodPressure? 
+                        {lastBloodPressure && lastBloodPressure.systolic ? 
                             <div className="d-flex justify-content-between">
                                 <span className="mb-0 text-muted small">{`Último registro: ${lastBloodPressure.systolic}/${lastBloodPressure.diastolic} mmHg`}</span>
                                 <span className="mb-0 text-muted small">{`Fecha: ${lastBloodPressure.manual_datetime}`}</span>
