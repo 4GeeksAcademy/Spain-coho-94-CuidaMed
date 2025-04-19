@@ -24,7 +24,7 @@ class User(db.Model):
     general_data = relationship(
         "GeneralData", back_populates="user", cascade="all, delete-orphan")
     emergency_contacts = relationship(
-        "EmergencyContact", back_populates="user")
+        "EmergencyContact", back_populates="user", cascade="all, delete-orphan")
     medical_history = relationship(
         "MedicalHistory", back_populates="user", cascade="all, delete-orphan")
     personal_antecedents = relationship(
