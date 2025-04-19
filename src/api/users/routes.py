@@ -70,10 +70,11 @@ def user_dashboard():
         # Obtener contacto de emergencia
         try:
             emergency_contact = EmergencyContact.query.filter_by(user_id=current_user_id).first()
-            response['last_emergency_contact'] = emergency_contact.serialize_emergency_contact() if emergency_contact else None
+            response['last_emergency_contact'] = emergency_contact.serialize_emergency_contacts() if emergency_contact else None
         except Exception as e:
             print(f"Error al obtener el contacto de emergencia: {str(e)}")
             
+        
         # Verificar si se obtuvo al menos un dato
         all_empty = (
             response['last_blood_pressure'] is None and

@@ -341,7 +341,7 @@ const EmergencyContact = () => {
 
                                         <div className="d-flex flex-column align-items-center">
                                             <div className="border border-primary border-3 rounded p-2 bg-white">
-                                            <EmergencyContactQR phoneContact={emergencyContact.phoneContact}/>
+                                            <EmergencyContactQR phoneContact={emergencyContact.phoneContact} size={180}/>
                                             </div>
 
                                             <div className="mt-3 bg-light p-3 rounded text-center" style={{ maxWidth: "320px" }}>
