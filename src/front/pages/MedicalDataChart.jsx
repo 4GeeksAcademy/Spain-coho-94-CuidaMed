@@ -104,8 +104,8 @@ const MedicalDataChart = () => {
                     formattedData = bpData.map(record => {
                         return {
                         date: formatDate(record.manual_datetime),
-                        sistólica: record.systolic,
-                        diastólica: record.diastolic,
+                        sistolica: record.systolic,
+                        diastolica: record.diastolic,
                         id:record.id
                         }
                     });
@@ -143,7 +143,7 @@ const MedicalDataChart = () => {
         switch (dataType) {
             case 'glucose': return ['glucosa'];
             case 'weight': return ['peso'];
-            case 'bloodpressure': return ['sistólica', 'diastólica'];
+            case 'bloodpressure': return ['sistolica', 'diastolica'];
             case 'pulse': return ['pulso'];
             default: return ['glucosa']
         }
