@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import GlucoseChart from "/src/front/assets/img/GlucoseChart.png"
 
 const LandingPage = () => {
     return (
@@ -152,7 +153,7 @@ const LandingPage = () => {
                                 </div>
 
                                 <img
-                                    src="src/front/assets/img/medical-enrollment-form-document-medicare-concept.jpeg"
+                                    src={GlucoseChart}
                                     alt="HealthTrack app demo"
                                     className="img-fluid rounded-top"
                                     style={{ marginTop: "2rem" }}
