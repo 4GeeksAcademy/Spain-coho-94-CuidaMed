@@ -21,6 +21,7 @@ const Graphics = ({
   patientData,
   dataKeys,
   dataType,
+  subType = null,
 }) => {
   // Estado para controlar la visualización de rangos en el gráfico
   const [showRanges, setShowRanges] = useState(false);
@@ -80,6 +81,8 @@ const Graphics = ({
       case "weight":
         return "Peso (kg)";
       case "bloodpressure":
+        if (subType === "sistolica") return "Presión Sistólica (mmHg)";
+        if (subType === "diastolica") return "Presión Diastólica (mmHg)";
         return "Presión (mmHg)";
       case "pulse":
         return "Pulso (bpm)";
@@ -91,6 +94,11 @@ const Graphics = ({
   // Acceder a los rangos según el tipo de dato actual
   const getCurrentRanges = () => {
     if (dataType === "bloodpressure") {
+      if (subType == "sistolica"){
+        return { sistolica: healthRanges.bloodpressure.sistolica };
+      } else if (subType === "diastolica") {
+        return { diastolica: healthRanges.bloodpressure.diastolica }
+      }
       return {
         sistolica: healthRanges.bloodpressure.sistolica,
         diastolica: healthRanges.bloodpressure.diastolica,

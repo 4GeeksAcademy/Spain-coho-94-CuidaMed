@@ -139,11 +139,14 @@ const MedicalDataChart = () => {
     }, [dataType]);
 
      //función para determinar qué campos renderizar en el gráfico según el tipo de datos
-     const getDataKeys = () => {
+     const getDataKeys = (subType = null) => {
         switch (dataType) {
             case 'glucose': return ['glucosa'];
             case 'weight': return ['peso'];
-            case 'bloodpressure': return ['sistolica', 'diastolica'];
+            case 'bloodpressure':
+                if (subType === 'sistolica') return ['sistolica'];
+                if (subType === 'diastolica') return ['diastolica'];
+                return ['sistolica', 'diastolica'];
             case 'pulse': return ['pulso'];
             default: return ['glucosa']
         }
@@ -153,8 +156,11 @@ const MedicalDataChart = () => {
         'glucose': 'Glucosa',
         'weight': 'Peso',
         'bloodpressure': 'Tensión Arterial',
-        'pulse': 'Pulso'
+        'pulse': 'Pulso',
+        'sistolica': 'Presión Sistólica',
+        'diastolica': 'Presión Diastólica'
      };
+
     return (
         <>
             <div className="container mt-4">
@@ -165,7 +171,36 @@ const MedicalDataChart = () => {
                 {!isLoading && !error && patientData.length === 0 && 
                     <p>No hay datos disponibles para mostrar.</p>
                 }
-                {patientData.length > 0 && (
+
+                {patientData.length > 0 && dataType === 'bloodpressure' && (
+                    <>
+                        <div className="mb-5">
+                            <h3>{dataTypeNames['sistolica']}</h3>
+                            <Graphics 
+                                chartType={chartType}
+                                setChartType={setChartType}
+                                patientData={patientData}
+                                dataKeys={getDataKeys('sistolica')}
+                                dataType={dataType}
+                                subType="sistolica"
+                            />
+                        </div>
+
+                        <div className="mt-5">
+                            <h3>{dataTypeNames['diastolica']}</h3>
+                            <Graphics 
+                                chartType={chartType}
+                                setChartType={setChartType}
+                                patientData={patientData}
+                                dataKeys={getDataKeys('diastolica')}
+                                dataType={dataType}
+                                subType="diastolica"
+                            />
+                        </div>
+                    </>
+                )}
+
+                {patientData.length > 0 && dataType !== 'bloodpressure' && (
                     <Graphics
                     chartType={chartType}
                     setChartType={setChartType}
