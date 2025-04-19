@@ -26,6 +26,7 @@ import Dashboard from "./pages/Dashboard";
 import { LayoutPrivate } from "./pages/LayoutPrivate";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
+import Gallery from "./pages/Gallery";
 import MedicalDataChart from "./pages/MedicalDataChart";
 
 export const router = createBrowserRouter(
@@ -53,7 +54,7 @@ export const router = createBrowserRouter(
         <Route path="/records/height" element={<HeightRecords />} />
         <Route path="/records/allergies" element={<AllergyRecords />} />
         <Route
-          path="/records/medicalhistory"
+          path="/records/familyhistory"
           element={<MedicalHistoryRecords />}
         />
         <Route
@@ -64,7 +65,6 @@ export const router = createBrowserRouter(
         <Route path="/optionalform" element={<OptionalForm />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path= "/statistics/:dataType" element={<MedicalDataChart />} />
       </Route>
 
       <Route path="/login" element={<Login />} />

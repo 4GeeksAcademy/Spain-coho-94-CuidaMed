@@ -1,42 +1,13 @@
 import React, { useState, useEffect } from "react";
-import useGlobalReducer from "../hooks/useGlobalReducer";
-
 
 const PersonalAntecedentRecords= () => {
-    const { store, dispatch } = useGlobalReducer();
+    
     const [formData, setFormData] = useState({
         disease: "",
-        diagnosisDate: undefined,
+        diagnosisDate: "",
     }
     )
-    const [personalAntecedent, setPersonalAntecedent] = useState([
-        {
-            id: 1,
-            disease: "Hipertensión",
-            diagnosisDate: "2018-03-15"
-          },
-          {
-            id: 2,
-            disease: "Diabetes tipo 2",
-            diagnosisDate: "2020-07-10"
-          },
-          {
-            id: 3,
-            disease: "Asma",
-            diagnosisDate: "2015-11-22"
-          },
-          {
-            id: 4,
-            disease: "Alergia al polen",
-            diagnosisDate: "2012-05-03"
-          },
-          {
-            id: 5,
-            disease: "Colesterol alto",
-            diagnosisDate: "2019-09-30"
-          },
-          
-    ])
+    const [personalAntecedent, setPersonalAntecedent] = useState([])
 
     const [error, setError] = useState({
         form: "",
@@ -47,32 +18,47 @@ const PersonalAntecedentRecords= () => {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const accessToken = localStorage.getItem("accessToken");
 
     useEffect(() => {
         const fetchRecordData = async () => {
             try {
                 
-                const response = await fetch(/* URL*/"",
+                const response = await fetch(`${backendUrl}/api/records/personal_antecedents`,
                     {
                         method: 'GET',
                         headers: {
                             "Content-Type": "application/json",
-                            // Enviamos el token a BD en el header.
-                            "Authorization": `Bearer ${store.token}`
+                            "Authorization": `Bearer ${accessToken}`
                         }
                     });
-                const data = await response.json();
+                const result = await response.json();
+                console.log("Resultado del fetch:", result);
 
                 if (!response.ok) {
                     throw new Error(data.error || "Error al obtener el historial de antecedentes personales")
                 }
 
-                setPersonalAntecedent(/* data.loquesea */)
+                if (!Array.isArray(result)) {
+                    setPersonalAntecedent([]);
+                    return;
+                }
+
+                const formattedData = result.map(item => 
+                        ({
+                            recordId:item.id,
+                            disease: item.disease,
+                            diagnosisDate: item.diagnosis_date,
+                        }
+                    )
+                )
+                setPersonalAntecedent(formattedData)
 
             } catch (error) {
-                setError(...error, { list: error.message })
+                setError({...error, list: error.message })
             }
         }
+        fetchRecordData();
     }, [])
 
 
@@ -115,6 +101,10 @@ const PersonalAntecedentRecords= () => {
             }))
         }
     }
+    const formatDate = (dateStr) => {
+        const [year, month, day] = dateStr.split("-");
+        return `${day}-${month}-${year}`;
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -124,15 +114,22 @@ const PersonalAntecedentRecords= () => {
         setLoading(true);
 
         try {
-            
-            /*const response = await fetch(""/*URL backend, {
+            const formattedDate = formatDate(formData.diagnosisDate);
+            const response = await fetch(`${backendUrl}/api/records/personal_antecedents`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // Enviamos el token a BD en el header.
-                    "Authorization": `Bearer ${store.token}`
+                    "Authorization": `Bearer ${accessToken}`
                 },
-                body: JSON.stringify(formData) //Aqui tenemos que mapear los campos del backend y frontend
+                body: JSON.stringify(
+                    {
+                     disease:formData.disease,
+                     diagnosis_date:formData.diagnosisDate
+                     ? formattedDate
+                     : "",
+                    }
+                ) 
+
             })
 
             const data = await response.json();
@@ -140,13 +137,24 @@ const PersonalAntecedentRecords= () => {
             if (!response.ok) {
                 throw new Error(data.error || "Error al crear el registro");
             }
-            */
-            setPersonalAntecedent([formData, ...personalAntecedent]) //Actualizamos el estado pero hace falta el mapeo
+            
+            setPersonalAntecedent([
+                {
+                    recordId:data.id,
+                    disease: data.disease,
+                    diagnosisDate:data.diagnosis_date
+
+                }, 
+                ...personalAntecedent]) 
 
         } catch (error) {
             setError(error.data)
         } finally {
             setLoading(false)
+            setFormData({
+                disease:"",
+                diagnosisDate:""
+            })
         }
     }
 
@@ -156,21 +164,21 @@ const PersonalAntecedentRecords= () => {
 
     const handleDelete = async (recordId) => {
         try {
-            /*const response = await fetch(/* backend_url con el id del record"",
+            const response = await fetch( `${backendUrl}/api/records/personal_antecedents/${recordId}`,
                 {
                     method: 'DELETE',
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${store.token}`
+                        "Authorization": `Bearer ${accessToken}`
                     }
                 }
             )
             if (!response.ok) throw new Error("Error al eliminar el registro");
-            */
-            setPersonalAntecedent(personalAntecedent.filter((record)=> record.id !== recordId ))
+            
+            setPersonalAntecedent(personalAntecedent.filter((record)=> record.recordId !== recordId ))
             
         } catch (error) {
-            setError(...error,{ list: error.message })
+            setError({...error, list: error.message })
         }
 
     }
@@ -214,8 +222,10 @@ const PersonalAntecedentRecords= () => {
                                         <div className="invalid-feedback">{error.diagnosisDate}</div>
                                     )}
                                 </div>
-
-                                <button type="submit" className="btn btn-primary">Añadir registro</button>
+                                <div className="d-flex w-100 justify-content-end">
+                                    <button type="submit" className="btn btn-primary">Añadir registro</button>
+                                </div>
+                                
                             </form>
                         </div>
                     </div>
@@ -224,7 +234,7 @@ const PersonalAntecedentRecords= () => {
                     <div className="card me-2 h-100">
                         <h5 className="card-header bg-primary text-white">Historial de antecedentes</h5>
                         {error.list && (
-                            <div className="alert alert-danger mb-4" role="alert">
+                            <div className="alert alert-danger m-2" role="alert">
                                 {error.list}
                             </div>
                         )}
@@ -240,10 +250,10 @@ const PersonalAntecedentRecords= () => {
                                 <tbody>
                                     {personalAntecedent && personalAntecedent.slice((currentPage - 1) * 7, currentPage * 7).map((data) => {
                                         return (
-                                            <tr key={data.id}>
+                                            <tr key={data.recordId}>
                                                 <td>{data.disease}</td>
                                                 <td>{data.diagnosisDate}</td>
-                                                <td><button className="btn" onClick={()=>handleDelete(data.id)}><i className="text-danger fa-solid fa-trash"></i></button></td>
+                                                <td><button className="btn" onClick={()=>handleDelete(data.recordId)}><i className="text-danger fa-solid fa-trash"></i></button></td>
                                             </tr>
                                         )
                                     })}

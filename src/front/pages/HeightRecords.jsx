@@ -45,7 +45,7 @@ const HeightRecords = () => {
                 setHeightHistory(data.map(item => 
                     ({
                         recordId:item.id,
-                        glucoseValue:item.height,
+                        heightValue:item.height,
                         measurementDate: item.manual_datetime, 
                         comments:item.comments
                     })
@@ -57,13 +57,22 @@ const HeightRecords = () => {
         }
         fetchRecordData();
     }, [])
-    useEffect(() => {
-            if (heightHistory) {
-              const sorted = [...heightHistory].sort((a, b) => new Date(b.measurementDate) - new Date(a.measurementDate));
-              setSortedHistory(sorted);
-            }
-          }, [heightHistory]);
 
+    useEffect(() => {
+        const parseDate = (dateStr) => {
+            const [date, time] = dateStr.split(' ');
+            const [day, month, year] = date.split('-');
+            return new Date(`${year}-${month}-${day}T${time}`);
+        };
+    
+        if (heightHistory && heightHistory.length > 0) {
+            const sorted = [...heightHistory].sort(
+                (a, b) => parseDate(b.measurementDate) - parseDate(a.measurementDate)
+            );
+            setSortedHistory(sorted);
+            
+        }
+    }, [heightHistory]);
     const validateForm = () => {
 
         let valid = true
@@ -245,7 +254,10 @@ const HeightRecords = () => {
                                     />
                                     {error.comments && <div className="invalid-feedback">{error.comments}</div>}
                                 </div>
-                                <button type="submit" className="btn btn-primary">Añadir registro</button>
+                                <div className="d-flex w-100 justify-content-end">
+                                    <button type="submit" className="btn btn-primary">Añadir registro</button>
+                                </div>
+                                
                             </form>
 
                         </div>

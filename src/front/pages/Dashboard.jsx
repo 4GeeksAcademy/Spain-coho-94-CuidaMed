@@ -20,27 +20,24 @@ const Dashboard = () => {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        console.log("Ha entrado en el useEffect")
+        
         const fetchInfo = async () => {
-            console.log("Está ejecutando al funcion fetch")
+            
             const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
             const accessToken = localStorage.getItem("accessToken");
             
             // Verificar si el token existe
             if (!accessToken) {
                 setError("No se encontró el token de acceso. Por favor inicie sesión nuevamente.");
-                console.log("No ha encontrado el token")
+                
                 return;
             }
 
-            console.log("Justo antes del try")
+            
             try {
-                console.log("HA entrado en el try")
+                
                 setIsLoading(true);
                 setError(""); // Limpiar errores anteriores
-                
-                console.log("Iniciando petición a:", `${backendUrl}api/users/dashboard`);
-                console.log("Token usado:", accessToken.substring(0, 10) + "..."); // Mostrar solo parte del token por seguridad
                 
                 const response = await fetch(`${backendUrl}/api/users/dashboard`, { // Añadido '/' antes de api
                     method: "GET",
@@ -49,13 +46,8 @@ const Dashboard = () => {
                         "Authorization": `Bearer ${accessToken}`
                     }
                 });
-                
-                // Mostrar información detallada de la respuesta para depuración
-                console.log("Status code:", response.status);
-                console.log("Status text:", response.statusText);
-                
+
                 const data = await response.json();
-                console.log("Respuesta completa:", data);
                 
                 if (!response.ok) {
                     // Manejo específico de errores basado en códigos

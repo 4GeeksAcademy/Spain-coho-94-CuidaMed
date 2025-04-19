@@ -1,82 +1,17 @@
 import React, { useState, useEffect } from "react";
-import useGlobalReducer from "../hooks/useGlobalReducer";
+
 
 
 const MedicationRecords= () => {
-    const { store, dispatch } = useGlobalReducer();
+    
     const [formData, setFormData] = useState({
         medicationName: "",
         dosageInstructions:"",
         adverseReactions:"",
-        treatmentStartDate: undefined,
-        treatmentEndDate: undefined,
+        treatmentStartDate: "",
+        treatmentEndDate: "",
     })
-    const [medication, setMedication] = useState([
-        {
-            id: 1,
-            medicationName: "Paracetamol",
-            dosageInstructions: "500 mg cada 8 horas durante 5 días",
-            adverseReactions: "Náuseas leves",
-            treatmentStartDate: "2023-01-10",
-            treatmentEndDate: "2023-01-15"
-          },
-          {
-            id: 2,
-            medicationName: "Ibuprofeno",
-            dosageInstructions: "400 mg cada 6 horas con comida",
-            adverseReactions: "Dolor de estómago",
-            treatmentStartDate: "2022-11-05",
-            treatmentEndDate: "2022-11-10"
-          },
-          {
-            id: 3,
-            medicationName: "Amoxicilina",
-            dosageInstructions: "875 mg cada 12 horas por 7 días",
-            adverseReactions: "Erupción cutánea",
-            treatmentStartDate: "2023-04-01",
-            treatmentEndDate: "2023-04-08"
-          },
-          {
-            id: 4,
-            medicationName: "Metformina",
-            dosageInstructions: "850 mg dos veces al día",
-            adverseReactions: "Diarrea ocasional",
-            treatmentStartDate: "2021-06-15",
-            treatmentEndDate: "2021-12-15"
-          },
-          {
-            id: 5,
-            medicationName: "Losartán",
-            dosageInstructions: "50 mg una vez al día por la mañana",
-            adverseReactions: "Fatiga leve",
-            treatmentStartDate: "2022-03-20",
-            treatmentEndDate: "2022-06-20"
-          },
-          {
-            id: 6,
-            medicationName: "Omeprazol",
-            dosageInstructions: "20 mg antes del desayuno",
-            adverseReactions: "Dolor de cabeza leve",
-            treatmentStartDate: "2023-05-01",
-            treatmentEndDate: "2023-05-21"
-          },
-          {
-            id: 7,
-            medicationName: "Loratadina",
-            dosageInstructions: "10 mg una vez al día en la noche",
-            adverseReactions: "Somnolencia leve",
-            treatmentStartDate: "2022-04-10",
-            treatmentEndDate: "2022-04-17"
-          },
-          {
-            id: 8,
-            medicationName: "Prednisona",
-            dosageInstructions: "5 mg cada 12 horas",
-            adverseReactions: "Aumento de apetito",
-            treatmentStartDate: "2022-08-01",
-            treatmentEndDate: "2022-08-15"
-          }
-    ])
+    const [medication, setMedication] = useState([])
 
     const [error, setError] = useState({
         form: "",
@@ -90,32 +25,42 @@ const MedicationRecords= () => {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const accessToken = localStorage.getItem("accessToken");
 
     useEffect(() => {
         const fetchRecordData = async () => {
             try {
                 
-                const response = await fetch(/* URL*/"",
+                const response = await fetch(`${backendUrl}/api/records/medications`,
                     {
                         method: 'GET',
                         headers: {
                             "Content-Type": "application/json",
-                            // Enviamos el token a BD en el header.
-                            "Authorization": `Bearer ${store.token}`
+                            "Authorization": `Bearer ${accessToken}`
                         }
                     });
-                const data = await response.json();
+                const result = await response.json();
 
                 if (!response.ok) {
-                    throw new Error(data.error || "Error al obtener el historial de antecedentes personales")
+                    throw new Error(result.error || "Error al obtener el historial de tratamientos")
                 }
 
-                setMedication(/* data.loquesea */)
+                const formattedData = result.data.map(item => ({
+                    recordId: item.id,
+                    medicationName: item.medication_name,
+                    dosageInstructions: item.dosage_instructions,
+                    adverseReactions: item.adverse_reactions,
+                    treatmentStartDate: item.treatment_start_date || "",
+                    treatmentEndDate: item.treatment_end_date || ""
+                }));
+
+                setMedication(formattedData);
 
             } catch (error) {
-                setError(...error, { list: error.message })
+                setError(prev => ({ ...prev, list: error.message }));
             }
         }
+        fetchRecordData();
     }, [])
 
 
@@ -135,41 +80,53 @@ const MedicationRecords= () => {
         }
 
         if (!formData.dosageInstructions) {
-            newErrors.dosageInstructions = "Por favor, introduzca la pauta" //Actualizar con el valor máximo en la BD
+            newErrors.dosageInstructions = "Por favor, introduzca la pauta" 
             valid = false
         }else if (formData.dosageInstructions.length > 300) {
-            newErrors.dosageInstructions = "El valor máximo de caracteres es 300" //Actualizar con el valor máximo en la BD
+            newErrors.dosageInstructions = "El valor máximo de caracteres es 300" 
             valid = false
         }
 
         if (formData.adverseReactions.length > 300) {
-            newErrors.adverseReactions = "El valor máximo de caracteres es 300" //Actualizar con el valor máximo en la BD
+            newErrors.adverseReactions = "El valor máximo de caracteres es 300" 
             valid = false
         }
 
-        if (treatmentStartDate > treatmentEndDate) {
-            newErrors.treatmentEndDate = "La fecha fin debe ser superior a la de inicio del tratamiento"
-            valid = false
-        }
+        if (formData.treatmentStartDate && formData.treatmentEndDate && treatmentStartDate > treatmentEndDate) {
+            newErrors.treatmentEndDate = "La fecha fin debe ser posterior a la de inicio";
+            valid = false;
+          }
 
         setError(newErrors)
         return valid
     }
     const handleChange = (e) => {
-        const { name, value } = e.target
+        const { name, value } = e.target;
         setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }))
-
-        // Para borrar los errores al corregir el campo
+          ...prev,
+          [name]: value,
+        }));
+      
         if (error[name]) {
-            setError((prev) => ({
-                ...prev,
-                [name]: "",
-            }))
+          setError((prev) => ({
+            ...prev,
+            [name]: "",
+          }));
         }
-    }
+      
+        if (error.form) {
+          setError((prev) => ({
+            ...prev,
+            form: "",
+          }));
+        }
+      };
+
+    const formatDate = (dateStr) => {
+        const [year, month, day] = dateStr.split("-");
+        return `${day}-${month}-${year}`;
+    };
+      
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -179,29 +136,58 @@ const MedicationRecords= () => {
         setLoading(true);
 
         try {
-            
-            /*const response = await fetch(""/*URL backend, {
+
+            const response = await fetch(`${backendUrl}/api/records/medications`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // Enviamos el token a BD en el header.
-                    "Authorization": `Bearer ${store.token}`
+                    "Authorization": `Bearer ${accessToken}`
                 },
-                body: JSON.stringify(formData) //Aqui tenemos que mapear los campos del backend y frontend
-            })
+                body: JSON.stringify({
+                    medication_name: formData.medicationName,
+                    dosage_instructions: formData.dosageInstructions,
+                    adverse_reactions: formData.adverseReactions,
+                    treatment_start_date: formData.treatmentStartDate
+                      ? formatDate(formData.treatmentStartDate)
+                      : "",
+                    treatment_end_date: formData.treatmentEndDate
+                      ? formatDate(formData.treatmentEndDate)
+                      : ""
+                  })
+                  
+            });
+            
 
             const data = await response.json();
 
             if (!response.ok) {
                 throw new Error(data.error || "Error al crear el registro");
             }
-            */
-            setMedication([formData, ...medication]) //Actualizamos el estado pero hace falta el mapeo
+            
+            setMedication([
+                {
+                    recordId: data.id,
+                    medicationName: data.medication_name,
+                    dosageInstructions: data.dosage_instructions,
+                    adverseReactions: data.adverse_reactions,
+                    treatmentStartDate: data.treatment_start_date,
+                    treatmentEndDate: data.treatment_end_date
+                }, ...medication]) 
 
         } catch (error) {
-            setError(error.data)
+            setError(prev => ({
+                ...prev,
+                form: error.message
+            }));
         } finally {
             setLoading(false)
+            setFormData({
+                medicationName: "",
+                dosageInstructions: "",
+                adverseReactions: "",
+                treatmentStartDate: "",
+                treatmentEndDate: ""
+            });
         }
     }
 
@@ -211,28 +197,28 @@ const MedicationRecords= () => {
 
     const handleDelete = async (recordId) => {
         try {
-            /*const response = await fetch(/* backend_url con el id del record"",
+            const response = await fetch( `${backendUrl}/api/records/medications/${recordId}`,
                 {
                     method: 'DELETE',
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${store.token}`
+                        "Authorization": `Bearer ${accessToken}`
                     }
                 }
             )
             if (!response.ok) throw new Error("Error al eliminar el registro");
-            */
-            setMedication(medication.filter((record)=> record.id !== recordId ))
+            
+            setMedication(medication.filter((record)=> record.recordId !== recordId ))
             
         } catch (error) {
-            setError(...error,{ list: error.message })
+            setError({...error, list: error.message })
         }
 
     }
     return (
         <>
-            <div className="row g-4 mt-2">
-                <div className="col-12 col-lg-4 order-1">
+            <div className="row justify-content-center g-4 mt-2">
+                <div className="col-md-4">
                     <div className="card ms-2 ">
                         <h5 className="card-header bg-primary text-white">Añade un nuevo registro</h5>
                         <div className="card-body">
@@ -309,13 +295,15 @@ const MedicationRecords= () => {
                                         <div className="invalid-feedback">{error.treatmentEndDate}</div>
                                     )}
                                 </div>
-
-                                <button type="submit" className="btn btn-primary">Añadir registro</button>
+                                <div className="d-flex w-100 justify-content-end">
+                                    <button type="submit" className="btn btn-primary">Añadir registro</button>
+                                </div>
+                                
                             </form>
                         </div>
                     </div>
                 </div>
-                <div className="col-12 col-lg-8 order-2">
+                <div className="col-md-5 ms-3">
                     <div className="card me-2 h-100">
                         <h5 className="card-header bg-primary text-white">Tratamientos</h5>
                         {error.list && (
@@ -338,13 +326,13 @@ const MedicationRecords= () => {
                                 <tbody>
                                     {medication && medication.slice((currentPage - 1) * 8, currentPage * 8).map((data) => {
                                         return (
-                                            <tr key={data.id}>
+                                            <tr key={data.recordId}>
                                                 <td>{data.medicationName}</td>
                                                 <td>{data.dosageInstructions}</td>
                                                 <td>{data.adverseReactions}</td>
                                                 <td>{data.treatmentStartDate}</td>
                                                 <td>{data.treatmentEndDate}</td>
-                                                <td><button className="btn" onClick={()=>handleDelete(data.id)}><i className="text-danger fa-solid fa-trash"></i></button></td>
+                                                <td><button className="btn" onClick={()=>handleDelete(data.recordId)}><i className="text-danger fa-solid fa-trash"></i></button></td>
                                             </tr>
                                         )
                                     })}

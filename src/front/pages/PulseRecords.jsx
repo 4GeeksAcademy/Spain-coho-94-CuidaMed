@@ -1,45 +1,14 @@
 import React, { useState, useEffect } from "react";
-import useGlobalReducer from "../hooks/useGlobalReducer";
 
 
 const PulseRecords = () => {
-    // Definiendo estados
-    const { store, dispatch } = useGlobalReducer();
     const [formData, setFormData] = useState({
         pulseValue: undefined,
-        measurementDate: undefined, 
+        measurementDate: "", 
         comments: ""
     }
     )
-    const [pulseHistory, setPulseHistory] = useState([
-
-        { id: 1, pulseValue: 72, measurementDate: "2025-03-01T08:30", comments: "En reposo" },
-        { id: 2, pulseValue: 85, measurementDate: "2025-03-01T13:15", comments: "Después de caminar" },
-        { id: 3, pulseValue: 76, measurementDate: "2025-03-02T08:00", comments: "En ayunas" },
-        { id: 4, pulseValue: 90, measurementDate: "2025-03-02T19:20", comments: "Después de cenar" },
-        { id: 5, pulseValue: 70, measurementDate: "2025-03-03T07:50", comments: "Antes del desayuno" },
-        { id: 6, pulseValue: 95, measurementDate: "2025-03-03T14:10", comments: "Después de ejercicio leve" },
-        { id: 7, pulseValue: 60, measurementDate: "2025-03-04T08:10", comments: "En reposo profundo" },
-        { id: 8, pulseValue: 82, measurementDate: "2025-03-04T18:30", comments: "Tarde tranquila" },
-        { id: 9, pulseValue: 68, measurementDate: "2025-03-05T08:20", comments: "Antes de desayunar" },
-        { id: 10, pulseValue: 88, measurementDate: "2025-03-05T20:00", comments: "Después de una caminata larga" },
-        { id: 11, pulseValue: 75, measurementDate: "2025-03-06T07:45", comments: "Ritmo normal" },
-        { id: 12, pulseValue: 93, measurementDate: "2025-03-06T12:00", comments: "Con algo de estrés" },
-        { id: 13, pulseValue: 58, measurementDate: "2025-03-07T08:15", comments: "Recién despertado" },
-        { id: 14, pulseValue: 79, measurementDate: "2025-03-07T19:00", comments: "Después de merienda" },
-        { id: 15, pulseValue: 66, measurementDate: "2025-03-08T08:00", comments: "En reposo" },
-        { id: 16, pulseValue: 81, measurementDate: "2025-03-08T13:30", comments: "Actividad leve" },
-        { id: 17, pulseValue: 73, measurementDate: "2025-03-09T08:40", comments: "Lectura matinal" },
-        { id: 18, pulseValue: 97, measurementDate: "2025-03-09T15:10", comments: "Después del ejercicio" },
-        { id: 19, pulseValue: 69, measurementDate: "2025-03-10T08:25", comments: "Ritmo estable" },
-        { id: 20, pulseValue: 87, measurementDate: "2025-03-10T18:45", comments: "Cansancio leve" },
-        { id: 21, pulseValue: 62, measurementDate: "2025-03-11T08:30", comments: "En ayunas" },
-        { id: 22, pulseValue: 84, measurementDate: "2025-03-11T14:00", comments: "Después de comer" },
-        { id: 23, pulseValue: 74, measurementDate: "2025-03-12T07:55", comments: "Normal matutino" },
-        { id: 24, pulseValue: 91, measurementDate: "2025-03-12T19:10", comments: "Noche activa" },
-        { id: 25, pulseValue: 67, measurementDate: "2025-03-13T08:05", comments: "Antes del desayuno" },
-
-    ])
+    const [pulseHistory, setPulseHistory] = useState([])
     const [sortedHistory, setSortedHistory] = useState([]);
     const [error, setError] = useState({
         form: "",
@@ -51,19 +20,18 @@ const PulseRecords = () => {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+    const accessToken = localStorage.getItem("accessToken");
 
-    //useEffect para cargar los datos de la base de datos
     useEffect(() => {
         const fetchRecordData = async () => {
             try {
                 
-                const response = await fetch(/* URL*/"",
+                const response = await fetch(`${backendUrl}/api/records/pulse`,
                     {
                         method: 'GET',
                         headers: {
                             "Content-Type": "application/json",
-                            // Enviamos el token a BD en el header.
-                            "Authorization": `Bearer ${store.token}`
+                            "Authorization": `Bearer ${accessToken}`
                         }
                     });
                 const data = await response.json();
@@ -72,21 +40,38 @@ const PulseRecords = () => {
                     throw new Error(data.error || "Error al obtener el historial de registros")
                 }
 
-                setPulseHistory(/* data.loquesea */)
+                setPulseHistory(data.map(item => 
+                    ({
+                        recordId:item.id,
+                        pulseValue:item.pulse,
+                        measurementDate: item.manual_datetime, 
+                        comments:item.comments
+                    })
+                ));
 
             } catch (error) {
-                setError(...error, { list: error.message })
+                setError({...error,  list: error.message })
             }
         }
+        fetchRecordData();
     }, [])
 
-    //useEffect para ordenar los datos por fecha al añadir un registro
+
     useEffect(() => {
-            if (pulseHistory) {
-              const sorted = [...pulseHistory].sort((a, b) => new Date(b.measurementDate) - new Date(a.measurementDate));
-              setSortedHistory(sorted);
-            }
-          }, [pulseHistory]);
+        const parseDate = (dateStr) => {
+            const [date, time] = dateStr.split(' ');
+            const [day, month, year] = date.split('-');
+            return new Date(`${year}-${month}-${day}T${time}`);
+        };
+    
+        if (pulseHistory && pulseHistory.length > 0) {
+            const sorted = [...pulseHistory].sort(
+                (a, b) => parseDate(b.measurementDate) - parseDate(a.measurementDate)
+            );
+            setSortedHistory(sorted);
+            
+        }
+    }, [pulseHistory]);
 
     //Validación de campos del formulario
     const validateForm = () => {
@@ -133,6 +118,17 @@ const PulseRecords = () => {
         }
     }
 
+    const formatDatetime = (datetimeStr) => {
+        const dateObj = new Date(datetimeStr);
+        const day = String(dateObj.getDate()).padStart(2, "0");
+        const month = String(dateObj.getMonth() + 1).padStart(2, "0"); // enero = 0
+        const year = dateObj.getFullYear();
+        const hours = String(dateObj.getHours()).padStart(2, "0");
+        const minutes = String(dateObj.getMinutes()).padStart(2, "0");
+      
+        return `${day}-${month}-${year} ${hours}:${minutes}`;
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) {
@@ -141,15 +137,18 @@ const PulseRecords = () => {
         setLoading(true);
 
         try {
-            
-            /*const response = await fetch(""/*URL backend, {
+            const formattedDate = formatDatetime(formData.measurementDate);
+            const response = await fetch(`${backendUrl}/api/records/pulse`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // Enviamos el token a BD en el header.
-                    "Authorization": `Bearer ${store.token}`
+                    "Authorization": `Bearer ${accessToken}`
                 },
-                body: JSON.stringify(formData) //Aqui tenemos que mapear los campos del backend y frontend
+                body: JSON.stringify({
+                    pulse:formData.pulseValue,
+                    manual_datetime:formattedDate,
+                    comments:formData.comments
+                }) 
             })
 
             const data = await response.json();
@@ -157,13 +156,23 @@ const PulseRecords = () => {
             if (!response.ok) {
                 throw new Error(data.error || "Error al crear el registro");
             }
-            */
-            setPulseHistory([formData, ...pulseHistory]) //Actualizamos el estado pero hace falta el mapeo
+            
+            setPulseHistory([{
+                pulseValue:data.pulse,
+                measurementDate:data.manual_datetime,
+                comments:data.comments,
+                recordId:data.id,
+            }, ...pulseHistory]) 
 
         } catch (error) {
             setError(error.data)
         } finally {
             setLoading(false)
+            setFormData({
+                pulseValue:"",
+                measurementDate: "",
+                comments: ""
+            })
         }
     }
 
@@ -173,21 +182,21 @@ const PulseRecords = () => {
 
     const handleDelete = async (recordId) => {
         try {
-            /*const response = await fetch(/* backend_url con el id del record"",
+            const response = await fetch( `${backendUrl}/api/records/pulse/${recordId}`,
                 {
                     method: 'DELETE',
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${store.token}`
+                        "Authorization": `Bearer ${accessToken}`
                     }
                 }
             )
             if (!response.ok) throw new Error("Error al eliminar el registro");
-            */
-            setPulseHistory(pulseHistory.filter((record)=> record.id !== recordId ))
+            
+            setPulseHistory(pulseHistory.filter((record)=> record.recordId !== recordId ))
             
         } catch (error) {
-            setError(...error,{ list: error.message })
+            setError({...error, list: error.message })
         }
 
     }
@@ -247,7 +256,10 @@ const PulseRecords = () => {
                                     />
                                     {error.comments && <div className="invalid-feedback">{error.comments}</div>}
                                 </div>
-                                <button type="submit" className="btn btn-primary">Añadir registro</button>
+                                <div className="d-flex w-100 justify-content-end">
+                                    <button type="submit" className="btn btn-primary">Añadir registro</button>
+                                </div>
+                                
                             </form>
 
                         </div>
@@ -272,11 +284,11 @@ const PulseRecords = () => {
                                 <tbody>
                                     {sortedHistory && sortedHistory.slice((currentPage - 1) * 7, currentPage * 7).map((data) => {
                                         return (
-                                            <tr key={data.id}>
+                                            <tr key={data.recordId}>
                                                 <td >{data.pulseValue}</td>
                                                 <td >{data.measurementDate}</td>
                                                 <td >{data.comments}</td>
-                                                <td><button className="btn" onClick={()=>handleDelete(data.id)}><i className="text-danger fa-solid fa-trash"></i></button></td>
+                                                <td><button className="btn" onClick={()=>handleDelete(data.recordId)}><i className="text-danger fa-solid fa-trash"></i></button></td>
                                             </tr>
                                         )
                                     })}

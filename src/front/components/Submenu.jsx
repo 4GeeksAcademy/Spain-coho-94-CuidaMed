@@ -37,7 +37,7 @@ const Submenu = () => {
               <li><Link to="/records/allergies" className="dropdown-item"><i className="fa-solid fa-triangle-exclamation me-2"></i> Alergias</Link></li>
               <li><Link to="/records/familyhistory" className="dropdown-item"><i className="fa-solid fa-users me-2"></i> Antecedentes familiares</Link></li>
               <li><Link to="/records/personalhistory" className="dropdown-item"><i className="fa-solid fa-user me-2"></i> Antecedentes personales</Link></li>
-              <li><Link to="/records/treatments" className="dropdown-item"><i className="fa-solid fa-pills me-2"></i> Tratamientos</Link></li>
+              <li><Link to="/records/medication" className="dropdown-item"><i className="fa-solid fa-pills me-2"></i> Tratamientos</Link></li>
             </ul>
           </div>
 

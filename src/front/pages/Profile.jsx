@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import DeleteModal from "../components/DeleteModal";
+import SuccessModal from "../components/SuccessModal";
 
 const Profile = () => {
-
+    const navigate = useNavigate()
     const [formData, setFormData] = useState({
         fullName: "",
         birthDate: undefined,
@@ -32,6 +35,8 @@ const Profile = () => {
     const [age, setAge] = useState(null)
     const [imc, setImc] = useState(null)
     const [loading, setLoading] = useState(true);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showUpModal, setShowUpModal] = useState(false)
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const accessToken = localStorage.getItem("accessToken");
 
@@ -272,9 +277,21 @@ const Profile = () => {
         }
     }
 
-    const handleDelete = async (recordId) => {
+    const handleModal = () => {
+        setShowUpModal(true)
+    }
+
+    function redirectToUserPage() {
+        setShowSuccessModal(false);
+        navigate('/profile') 
+      }
+    const handleSuccess = () => {
+        setShowSuccessModal(true)
+    }
+
+    const handleDelete = async () => {
         try {
-            const response = await fetch(`${backendUrl}/api/records/glucose/${recordId}`,
+            const response = await fetch(`${backendUrl}/api/users/delete`,
                 {
                     method: 'DELETE',
                     headers: {
@@ -283,9 +300,10 @@ const Profile = () => {
                     }
                 }
             )
-            if (!response.ok) throw new Error("Error al eliminar el registro");
+            if (!response.ok) throw new Error("Error al eliminar el usuario");
 
-            setGlucoseHistory(glucoseHistory.filter((record) => record.recordId !== recordId))
+            localStorage.removeItem("accessToken")
+            navigate("/signup")
 
         } catch (error) {
             setError({ ...error, list: error.message })
@@ -495,9 +513,27 @@ const Profile = () => {
                                 </div>
                         </div>
                         <div className="d-flex justify-content-end ">
-                            <button type="button" className="btn btn-danger me-3">Eliminar perfil</button>
-                            <button type="submit" className="btn btn-primary">Actualizar perfil</button>
+                            <button type="button" className="btn btn-danger me-3" onClick={handleModal}>Eliminar perfil</button>
+                            <button type="submit" className="btn btn-primary" onClick={handleSuccess}>Actualizar perfil</button>
                         </div>
+                        <SuccessModal
+                            showSuccessModal={showSuccessModal}
+                            modalTitle={"¡Formulario enviado con éxito!"}
+                            text={"Tus datos han sido actualizados correctamente."}
+                            onRedirect={redirectToUserPage}
+                        />
+                        <DeleteModal
+                            showDeleteModal={showUpModal}
+                            modalTitle = "ELIMINAR USUARIO"
+                            setShowDeleteModal={setShowUpModal}
+                            errorMessage = "¡Advertencia!"
+                            text = "¿Está seguro que desea eliminar el usuario y toda la información asociada a este? Esta acción no se podrá deshacer."
+                            handleDelete = {handleDelete}
+                            buttonText = "Eliminar usuario"
+
+
+                        />
+
 
                     </form>
 

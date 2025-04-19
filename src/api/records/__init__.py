@@ -5,12 +5,15 @@ from .medications import medications_blueprint
 from .medical_history import medical_history_blueprint
 from flask import Blueprint
 
+from .allergy import allergy_blueprint
 from .blood_pressure import blood_pressure_blueprint
 from .emergency_contact import emergency_contact_blueprint
 from .glucose import glucose_blueprint
 from .height import height_blueprint
 
 records_blueprint = Blueprint('records', __name__)
+
+records_blueprint.register_blueprint(allergy_blueprint, url_prefix='/allergy')
 
 records_blueprint.register_blueprint(
     blood_pressure_blueprint, url_prefix='/bloodpressure')
