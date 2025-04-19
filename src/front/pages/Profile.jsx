@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import DeleteModal from "../components/DeleteModal";
+import SuccessModal from "../components/SuccessModal";
 
 const Profile = () => {
     const navigate = useNavigate()
@@ -34,6 +35,7 @@ const Profile = () => {
     const [age, setAge] = useState(null)
     const [imc, setImc] = useState(null)
     const [loading, setLoading] = useState(true);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showUpModal, setShowUpModal] = useState(false)
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const accessToken = localStorage.getItem("accessToken");
@@ -279,6 +281,14 @@ const Profile = () => {
         setShowUpModal(true)
     }
 
+    function redirectToUserPage() {
+        setShowSuccessModal(false);
+        navigate('/profile') 
+      }
+    const handleSuccess = () => {
+        setShowSuccessModal(true)
+    }
+
     const handleDelete = async () => {
         try {
             const response = await fetch(`${backendUrl}/api/users/delete`,
@@ -504,8 +514,14 @@ const Profile = () => {
                         </div>
                         <div className="d-flex justify-content-end ">
                             <button type="button" className="btn btn-danger me-3" onClick={handleModal}>Eliminar perfil</button>
-                            <button type="submit" className="btn btn-primary">Actualizar perfil</button>
+                            <button type="submit" className="btn btn-primary" onClick={handleSuccess}>Actualizar perfil</button>
                         </div>
+                        <SuccessModal
+                            showSuccessModal={showSuccessModal}
+                            modalTitle={"¡Formulario enviado con éxito!"}
+                            text={"Tus datos han sido actualizados correctamente."}
+                            onRedirect={redirectToUserPage}
+                        />
                         <DeleteModal
                             showDeleteModal={showUpModal}
                             modalTitle = "ELIMINAR USUARIO"
