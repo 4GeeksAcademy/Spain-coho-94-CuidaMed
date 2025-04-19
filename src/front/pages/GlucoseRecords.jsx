@@ -54,11 +54,20 @@ const GlucoseRecords = () => {
         fetchRecordData();
     }, [])
     useEffect(() => {
-            if (glucoseHistory) {
-              const sorted = [...glucoseHistory].sort((a, b) => new Date(b.measurementDate) - new Date(a.measurementDate));
-              setSortedHistory(sorted);
-            }
-          }, [glucoseHistory]);
+        const parseDate = (dateStr) => {
+            const [date, time] = dateStr.split(' ');
+            const [day, month, year] = date.split('-');
+            return new Date(`${year}-${month}-${day}T${time}`);
+        };
+    
+        if (glucoseHistory && glucoseHistory.length > 0) {
+            const sorted = [...glucoseHistory].sort(
+                (a, b) => parseDate(b.measurementDate) - parseDate(a.measurementDate)
+            );
+            setSortedHistory(sorted);
+            
+        }
+    }, [glucoseHistory]);
 
     const validateForm = () => {
 

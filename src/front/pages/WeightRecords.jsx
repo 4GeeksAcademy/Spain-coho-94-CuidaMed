@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
-import useGlobalReducer from "../hooks/useGlobalReducer";
-
 
 const WeightRecords = () => {
-    const { store, dispatch } = useGlobalReducer();
+   
     const [formData, setFormData] = useState({
         weightValue: undefined,
         measurementDate: undefined, 
@@ -57,12 +55,23 @@ const WeightRecords = () => {
         }
         fetchRecordData();
     }, [])
+
+    
     useEffect(() => {
-            if (weightHistory) {
-              const sorted = [...weightHistory].sort((a, b) => new Date(b.measurementDate) - new Date(a.measurementDate));
-              setSortedHistory(sorted);
-            }
-          }, [weightHistory]);
+        const parseDate = (dateStr) => {
+            const [date, time] = dateStr.split(' ');
+            const [day, month, year] = date.split('-');
+            return new Date(`${year}-${month}-${day}T${time}`);
+        };
+    
+        if (weightHistory && weightHistory.length > 0) {
+            const sorted = [...weightHistory].sort(
+                (a, b) => parseDate(b.measurementDate) - parseDate(a.measurementDate)
+            );
+            setSortedHistory(sorted);
+            
+        }
+    }, [weightHistory]);
 
     const validateForm = () => {
 

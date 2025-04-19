@@ -58,12 +58,22 @@ const BloodPressureRecords = () => {
         }
         fetchRecordData();
     }, [])
+
     useEffect(() => {
-        if (bloodPressureHistory) {
-          const sorted = [...bloodPressureHistory].sort((a, b) => new Date(b.measurementDate) - new Date(a.measurementDate));
-          setSortedHistory(sorted);
+        const parseDate = (dateStr) => {
+            const [date, time] = dateStr.split(' ');
+            const [day, month, year] = date.split('-');
+            return new Date(`${year}-${month}-${day}T${time}`);
+        };
+    
+        if (bloodPressureHistory && bloodPressureHistory.length > 0) {
+            const sorted = [...bloodPressureHistory].sort(
+                (a, b) => parseDate(b.measurementDate) - parseDate(a.measurementDate)
+            );
+            setSortedHistory(sorted);
+            
         }
-      }, [bloodPressureHistory]);
+    }, [bloodPressureHistory]);
 
     const validateForm = () => {
 
