@@ -192,7 +192,7 @@ const Gallery = () => {
 
         const data = await response.json();
 
-        if(response.ok){
+        if(!response.ok){
           throw new Error("Error al eliminar el archivo")
         }
 
