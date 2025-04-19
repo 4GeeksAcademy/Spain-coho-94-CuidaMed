@@ -56,13 +56,22 @@ const PulseRecords = () => {
         fetchRecordData();
     }, [])
 
-    
+
     useEffect(() => {
-            if (pulseHistory) {
-              const sorted = [...pulseHistory].sort((a, b) => new Date(b.measurementDate) - new Date(a.measurementDate));
-              setSortedHistory(sorted);
-            }
-          }, [pulseHistory]);
+        const parseDate = (dateStr) => {
+            const [date, time] = dateStr.split(' ');
+            const [day, month, year] = date.split('-');
+            return new Date(`${year}-${month}-${day}T${time}`);
+        };
+    
+        if (pulseHistory && pulseHistory.length > 0) {
+            const sorted = [...pulseHistory].sort(
+                (a, b) => parseDate(b.measurementDate) - parseDate(a.measurementDate)
+            );
+            setSortedHistory(sorted);
+            
+        }
+    }, [pulseHistory]);
 
     //Validación de campos del formulario
     const validateForm = () => {
@@ -160,7 +169,7 @@ const PulseRecords = () => {
         } finally {
             setLoading(false)
             setFormData({
-                glucoseValue:"",
+                pulseValue:"",
                 measurementDate: "",
                 comments: ""
             })
