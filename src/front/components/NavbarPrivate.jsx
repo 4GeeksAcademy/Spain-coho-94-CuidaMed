@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function NavbarPrivate() {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const navigate = useNavigate();
 
   const toggleProfileDropdown = () => {
     setShowProfileDropdown(!showProfileDropdown);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("accessToken");  
+    navigate("/login");  
   };
 
   return (
@@ -63,10 +69,13 @@ function NavbarPrivate() {
                   <hr className="dropdown-divider" />
                 </li>
                 <li>
-                  <Link to="/logout" className="dropdown-item d-flex align-items-center text-danger">
+                  <button 
+                    className="dropdown-item d-flex align-items-center text-danger"
+                    onClick={logout}
+                    >
                     <i className="fas fa-sign-out-alt me-2" style={{ fontSize: '16px' }}></i>
                     <span>Cerrar sesión</span>
-                  </Link>
+                  </button>
                 </li>
               </ul>
             </li>

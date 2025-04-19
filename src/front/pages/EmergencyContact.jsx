@@ -69,7 +69,6 @@ const EmergencyContact = () => {
 
         let valid = true
         const newErrors = { ...error }
-        const phoneRegex = /^(\+34\s)?\d{3}-\d{3}-\d{3}$/;
         const emailRegex = /\S+@\S+\.\S+/
 
 
@@ -95,16 +94,18 @@ const EmergencyContact = () => {
         }
 
         if (!formData.phoneContact) {
-            newErrors.phoneContact = "Por favor, introduzca un número de teléfono"
+            newErrors.phoneContact = "Por favor, introduzca un número de teléfono";
             valid = false
-        }else if(formData.phoneContact.length>20){
-            newErrors.phoneContact = "El valor máximo de caracteres es 20"
-            valid = false
-        }else if (!phoneRegex.test(formData.phoneContact)){
-
-            newErrors.phoneContact = "Formato incorrecto, por favor use 654-123-789 o +34 654-123-789"
-            valid = false
-        }
+          } else {
+            const cleanPhone = formData.phoneContact.replace(/\s/g, ''); // Esta línea elimina espacios para la validación
+            if (!cleanPhone.startsWith("+")) {
+              newErrors.phoneContact = "El número debe comenzar con '+' (Ejemplo: +34222331144)";
+              valid = false
+            } else if (!/^\+\d{11}$/.test(cleanPhone)) {
+              newErrors.phoneContact = "El número debe tener 12 caracteres (Ejemplo: +34XXXXXXXXX)";
+              valid = false
+            }
+          }
 
         if (!formData.emailContact) {
             newErrors.emailContact = "Por favor, introduzca el email"
@@ -222,6 +223,7 @@ const EmergencyContact = () => {
         <>
             <div className="row justify-content-center g-4 mt-2">
                 <div className="col-md-4">
+                    
                     <div className="card ms-2 ">
                         <h5 className="card-header bg-primary text-white">Añade un nuevo registro</h5>
                         <div className="card-body">
@@ -288,7 +290,7 @@ const EmergencyContact = () => {
                                             aria-describedby="phoneContact"
                                             value={formData.phoneContact}
                                             onChange={handleChange}
-                                            placeholder="+34 123-456-789"
+                                            placeholder="+34123456789"
                                         />
                                         {error.phoneContact && <div className="invalid-feedback">{error.phoneContact}</div>}
                                     </div>
@@ -312,6 +314,7 @@ const EmergencyContact = () => {
 
                         </div>
                     </div>
+
                 </div>
                 <div className="col-md-4 ms-3">
                     <div className="card me-2 h-100">
@@ -341,7 +344,7 @@ const EmergencyContact = () => {
 
                                         <div className="d-flex flex-column align-items-center">
                                             <div className="border border-primary border-3 rounded p-2 bg-white">
-                                            <EmergencyContactQR phoneContact={emergencyContact.phoneContact}/>
+                                            <EmergencyContactQR phoneContact={emergencyContact.phoneContact} size={180}/>
                                             </div>
 
                                             <div className="mt-3 bg-light p-3 rounded text-center" style={{ maxWidth: "320px" }}>
