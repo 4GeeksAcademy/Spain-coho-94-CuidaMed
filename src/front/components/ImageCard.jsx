@@ -1,6 +1,6 @@
 import React from "react";
 
-const ImageCard = ({imageUrl, imageTitle, imageDate, imageCategory, imageId}) => {
+const ImageCard = ({imageUrl, imageTitle, imageDate, imageCategory, imageId, handleDelete}) => {
     return(
         <div className="card h-100">
             <img                   
@@ -18,9 +18,8 @@ const ImageCard = ({imageUrl, imageTitle, imageDate, imageCategory, imageId}) =>
             </div>
             <div className="card-footer bg-white">
             <div className="btn-group w-100">
-                <button className="btn btn-outline-primary">Ver</button>
-                {/* Aquí hacemos que te redirija a la URL para ampliar imagen */}
-                <button className="btn btn-outline-danger">Eliminar</button>
+                <a className="btn btn-outline-primary" href={imageUrl} target="_blank">Ver</a>
+                <button className="btn btn-outline-danger" onClick={()=>handleDelete(imageId)}>Eliminar</button>
             </div>
             </div>
         </div>

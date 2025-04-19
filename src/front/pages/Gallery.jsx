@@ -1,37 +1,7 @@
 import { useState, useEffect } from "react"
 import ImageCard from "../components/ImageCard"
+import ErrorModal from "../components/ErrorModal"
 
-// Ejemplos
-const sampleImages = [
-  {
-    id: 1,
-    title: "Radiografía de tórax",
-    date: "15-05-2024",
-    category: "Radiografía",
-    url: "https://placehold.co/400x200",
-  },
-  {
-    id: 2,
-    title: "Análisis de sangre",
-    date: "10-03-2023",
-    category: "Analítica",
-    url: "https://placehold.co/400x200",
-  },
-  {
-    id: 3,
-    title: "Ecografía abdominal",
-    date: "20-01-2020",
-    category: "Documento",
-    url: "https://placehold.co/400x200",
-  },
-  {
-    id: 4,
-    title: "Electrocardiograma",
-    date: "25-09-2024",
-    category: "Documento",
-    url: "https://placehold.co/400x200",
-  },
-]
 
 const Gallery = () => {
     const [searchTerm, setSearchTerm] = useState("")
@@ -45,6 +15,14 @@ const Gallery = () => {
       date: "",
       file: null
     });
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [error, setError] = useState({
+      title: "",
+      category: "",
+      date: "",
+      file: "",
+      delete:""
+    })
 
     const categories = ["Radiografía", "Analítica", "Documento"]
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
@@ -94,12 +72,57 @@ const Gallery = () => {
     
     const handleUploadChange = (e) => {
       const { name, value, files } = e.target;
-      setUploadForm(prev => ({
+    
+      setUploadForm((prev) => ({
         ...prev,
-        [name]: files ? files[0] : value
+        [name]: name === "file" ? files[0] : value,
       }));
+    
+      if (error[name]) {
+        setError((prev) => ({
+          ...prev,
+          [name]: "",
+        }));
+      }
     };
     
+    const validateUploadForm = () => {
+      
+      const allowedExtensions = ["image/jpeg", "image/png", "application/pdf"];
+      const newError={...error}
+      let valid = true
+
+      if (!uploadForm.title.trim()) {
+        newError.title = "El título es obligatorio.";
+        valid = false
+      } else if (uploadForm.title.length > 300) {
+        newError.title = "El título no puede tener más de 300 caracteres.";
+        valid = false
+      }
+    
+      if (!uploadForm.category) {
+        newError.category = "Por favor, seleccione una categoría";
+        valid = false
+      }
+    
+      if (!uploadForm.date) {
+        newError.date = "La fecha es obligatoria.";
+        valid = false
+      }
+    
+      if (!uploadForm.file) {
+        newError.file = "Debes seleccionar una imagen o documento.";
+        valid = false
+      } else if (!allowedExtensions.includes(uploadForm.file.type)) {
+        newError.file = "Formato no válido. Usa JPG, PNG o PDF.";
+        valid = false
+      }
+
+      setError(newError)
+      return valid
+    };
+    
+
     const formatDatetime = (datetimeStr) => {
       const dateObj = new Date(datetimeStr);
       const day = String(dateObj.getDate()).padStart(2, "0");
@@ -111,7 +134,10 @@ const Gallery = () => {
       return `${day}-${month}-${year} ${hours}:${minutes}`;
     }
 
-    const handleUpload = async () => {
+    const handleUpload = async (e) => {
+
+      e.preventDefault();
+      if (!validateUploadForm()) return;
       
       const formattedDate = formatDatetime(uploadForm.date)
       
@@ -154,6 +180,32 @@ const Gallery = () => {
       }
     }
 
+    const handleDelete = async (imageId) => {
+      try {
+        const response = await fetch(`${backendUrl}/api/gallery/${imageId}`,
+          {
+          method: 'DELETE',
+          headers: {
+            "Authorization": `Bearer ${accessToken}`
+          }
+        });
+
+        const data = await response.json();
+
+        if(response.ok){
+          throw new Error("Error al eliminar el archivo")
+        }
+
+        setImageHistory(imageHistory.filter((file)=>file.id !== imageId))
+
+      } catch (err) {
+        setError({...error, delete: err.message})
+        setShowErrorModal(true)
+        
+      }
+    }
+
+    
   return (
     <div className="container py-4">
       <div className="d-flex align-items-center mb-4">
@@ -228,6 +280,7 @@ const Gallery = () => {
                     imageCategory={image.category} 
                     imageDate={image.date}
                     imageId={image.id}
+                    handleDelete={handleDelete}
                 />
             </div>
           ))}
@@ -251,12 +304,13 @@ const Gallery = () => {
                     </label>
                     <input 
                       type="text" 
-                      className="form-control" 
+                      className={`form-control ${error.title ? 'is-invalid' : ''}`}
                       id="imageTitle"
                       name="title"
                       value={uploadForm.title}
                       onChange={handleUploadChange}
                       />
+                      {error.title && <div className="invalid-feedback">{error.title}</div>}  
                   </div>
 
                   <div className="mb-3">
@@ -264,7 +318,7 @@ const Gallery = () => {
                       Categoría
                     </label>
                     <select 
-                      className="form-select" 
+                      className={`form-select ${error.category ? 'is-invalid' : ''}`}
                       id="imageCategory"
                       name="category"
                       value={uploadForm.category}
@@ -277,6 +331,7 @@ const Gallery = () => {
                         </option>
                       ))}
                     </select>
+                    {error.category !== "" && <div className="invalid-feedback">{error.category}</div>}  
                   </div>
 
                   <div className="mb-3">
@@ -285,12 +340,13 @@ const Gallery = () => {
                     </label>
                     <input 
                       type="date" 
-                      className="form-control" 
+                      className={`form-control ${error.date ? 'is-invalid' : ''}`}
                       id="imageDate"
                       name="date"
                       value={uploadForm.date}
                       onChange={handleUploadChange}
                       />
+                    {error.date && <div className="invalid-feedback">{error.date}</div>}  
                   </div>
 
                   <div className="mb-3">
@@ -299,16 +355,25 @@ const Gallery = () => {
                     </label>
                     <input 
                       type="file" 
-                      className="form-control" 
+                      className={`form-control ${error.file ? 'is-invalid' : ''}`}
                       id="imageFile" 
                       name="file"
                       onChange={handleUploadChange}
                       />
+                    {error.file && <div className="invalid-feedback">{error.file}</div>}  
                   </div>
                 </form>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowUploadModal(false)}>
+                <button type="button" className="btn btn-secondary" onClick={() => {
+                  setShowUploadModal(false)
+                  setError({
+                    title:"",
+                    category:"",
+                    date:"",
+                    file:"",
+                  })
+                }}>
                   Cancelar
                 </button>
                 <button type="button" className="btn btn-primary" onClick={handleUpload}>
@@ -320,6 +385,16 @@ const Gallery = () => {
           </div>
         </div>
       )}
+      {showErrorModal &&
+        <ErrorModal
+          showErrorModal={showErrorModal}
+          modalTitle={"Error al eliminar el archivo"}
+          setShowErrorModal={setShowErrorModal}
+          errorMessage={error.delete}
+          text={"Por favor, inténtalo de nuevo más tarde."}
+        />        
+      }
+
     </div>
   )
 }
