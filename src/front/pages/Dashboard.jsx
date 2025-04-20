@@ -83,7 +83,7 @@ const Dashboard = () => {
 
     return (
         <>
-            {/*<LayoutPrivate />*/}
+            
             <div className="background-pattern"></div>
             <div className="container">
                 <h1 className="mb-4 mt-4">Bienvenido a CuidaMed</h1>

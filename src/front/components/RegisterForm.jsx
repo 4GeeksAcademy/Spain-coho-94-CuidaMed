@@ -97,8 +97,19 @@ export default function RegisterForm() {
           })
       })
 
-      if(!response.ok){
-          throw new Error(data.error || "Error al registrar usuario")
+      if (!response.ok) {
+        if (response.status === 409) {
+          setErrors((prev) => ({
+            ...prev,
+            email: "El correo electrónico ya está registrado",
+          }))
+        } else {
+          setErrors((prev) => ({
+            ...prev,
+            form: data.error || "Error al registrar usuario",
+          }))
+        }
+        return
       }
 
       const data = await response.json()
