@@ -28,6 +28,25 @@ const Gallery = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const accessToken = localStorage.getItem("accessToken");
 
+    function parseImageDate(dateString) {
+      // Formato nuevo: yyyy-mm-dd
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        return new Date(`${dateString}T00:00`);
+      }
+    
+      // Formato viejo: dd-mm-yyyy HH:MM
+      if (dateString.includes(":")) {
+        const [day, month, rest] = dateString.split("-");
+        const [year, time] = rest.split(" ");
+        return new Date(`${year}-${month}-${day}T${time}`);
+      }
+    
+      // Por si acaso, devolver null si no coincide con ningún formato
+      return null;
+    }
+    
+    
+
     useEffect(()=>{
         const fetchImages = async () => {
           try {
@@ -61,14 +80,21 @@ const Gallery = () => {
         fetchImages()
     },[]);
 
-    useEffect(()=>{
-        setFilteredImages( imageHistory.filter((image) => {
-            const matchesSearch = image.title.toLowerCase().includes(searchTerm.toLowerCase())
-            const matchesCategory = selectedCategory === "" || image.category === selectedCategory
-            return matchesSearch && matchesCategory
-        }))
-    }
-    ,[searchTerm, selectedCategory, imageHistory])
+    useEffect(() => {
+      const filtered = imageHistory.filter((image) => {
+        const matchesSearch = image.title.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = selectedCategory === "" || image.category === selectedCategory;
+        return matchesSearch && matchesCategory;
+      });
+    
+      const sorted = [...filtered].sort((a, b) => {
+        const dateA = parseImageDate(a.date);
+        const dateB = parseImageDate(b.date);
+        return dateB - dateA;
+      });
+    
+      setFilteredImages(sorted);
+    }, [searchTerm, selectedCategory, imageHistory]);
     
     const handleUploadChange = (e) => {
       const { name, value, files } = e.target;
