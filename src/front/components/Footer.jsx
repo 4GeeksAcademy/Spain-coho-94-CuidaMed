@@ -56,11 +56,6 @@ export const Footer = () => {
               Gestión segura de tu salud. Toma el control de tu bienestar con nuestra plataforma.
             </p>
           </div>
-          <div className="col-md-4 text-md-end">
-            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="text-muted me-3"><i className="bi bi-facebook"></i></a>
-            <a href="https://x.com" target="_blank" rel="noopener noreferrer"  className="text-muted me-3"><i className="bi bi-twitter"></i></a>
-            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" className="text-muted"><i className="bi bi-instagram"></i></a>
-          </div>
         </div>
       </div>
     </footer>
