@@ -83,13 +83,36 @@ const BloodPressureRecords = () => {
         const selectedDate = new Date(formData.measurementDate);
 
         if (!formData.systolicValue) {
-            newErrors.systolicValue = "Por favor, introduzca un valor de tensión sistólica"
-            valid = false
+            newErrors.systolicValue = "Por favor, introduzca un valor de tensión sistólica";
+            valid = false;
+        } else if (formData.systolicValue < 0) {
+            newErrors.systolicValue = "La tensión sistólica no puede ser negativa";
+            valid = false;
+        } else if (formData.systolicValue < 70 || formData.systolicValue > 300) {
+            newErrors.systolicValue = "Por favor, introduzca un valor sistólico entre 70 y 300 mmHg";
+            valid = false;
         }
+
         if (!formData.diastolicValue) {
-            newErrors.diastolicValue = "Por favor, introduzca un valor de tensión diastólica"
-            valid = false
+            newErrors.diastolicValue = "Por favor, introduzca un valor de tensión diastólica";
+            valid = false;
+        } else if (formData.diastolicValue < 0) {
+            newErrors.diastolicValue = "La tensión diastólica no puede ser negativa";
+            valid = false;
+        } else if (formData.diastolicValue < 40 || formData.diastolicValue > 200) {
+            newErrors.diastolicValue = "Por favor, introduzca un valor diastólico entre 40 y 200 mmHg";
+            valid = false;
         }
+
+        if (
+            formData.systolicValue &&
+            formData.diastolicValue &&
+            Number(formData.diastolicValue) >= Number(formData.systolicValue)
+          ) {
+            newErrors.diastolicValue = "La tensión diastólica no puede ser mayor o igual que la sistólica";
+            valid = false;
+          }
+
         if (!formData.measurementDate) {
             newErrors.measurementDate = "Por favor, seleccione una fecha de medición"
             valid = false
