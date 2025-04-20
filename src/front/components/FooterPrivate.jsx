@@ -23,7 +23,7 @@ const FooterPrivate = () => {
                         </div>
 
                         <div className="col-md-4 text-md-end">
-                            <h6 className="fw-bold text-dark small mb-2">Creadores</h6>
+                            <h6 className="fw-bold text-dark small mb-2">Desarrolladores</h6>
                             <ul className="list-unstyled small mb-0">
                                 <li>
                                     <a href="https://github.com/MichPisani" target="_blank" rel="noopener noreferrer" className="text-muted text-decoration-none">MichPisani</a>

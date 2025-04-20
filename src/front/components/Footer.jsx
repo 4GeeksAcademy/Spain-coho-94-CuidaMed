@@ -25,7 +25,7 @@ export const Footer = () => {
           <div className="col-md-auto ms-auto me-5">
             <div className="row">
               <div className="col-12 col-md-6 mb-3">
-                <h6 className="fw-bold text-dark">Creadores</h6>
+                <h6 className="fw-bold text-dark">Desarrolladores</h6>
                 <ul className="list-unstyled small ms-3">
                   <li>
 					<a href="https://github.com/MichPisani" target="_blank" rel="noopener noreferrer" className="text-muted text-decoration-none">
@@ -57,9 +57,9 @@ export const Footer = () => {
             </p>
           </div>
           <div className="col-md-4 text-md-end">
-            <a href="#" className="text-muted me-3"><i className="bi bi-facebook"></i></a>
-            <a href="#" className="text-muted me-3"><i className="bi bi-twitter"></i></a>
-            <a href="#" className="text-muted"><i className="bi bi-instagram"></i></a>
+            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="text-muted me-3"><i className="bi bi-facebook"></i></a>
+            <a href="https://x.com" target="_blank" rel="noopener noreferrer"  className="text-muted me-3"><i className="bi bi-twitter"></i></a>
+            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" className="text-muted"><i className="bi bi-instagram"></i></a>
           </div>
         </div>
       </div>
