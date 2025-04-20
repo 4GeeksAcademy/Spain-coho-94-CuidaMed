@@ -22,6 +22,7 @@ const Graphics = ({
   dataKeys,
   dataType,
   subType = null,
+  options = "show",
 }) => {
   // Estado para controlar la visualización de rangos en el gráfico
   const [showRanges, setShowRanges] = useState(false);
@@ -36,7 +37,7 @@ const Graphics = ({
     },
     weight: {
       normal: { min: 50, max: 80 },
-      danger: { min: 80, max: 120 },
+      warning: { min: 80, max: 120 },
     },
     bloodpressure: {
       sistolica: {
@@ -142,15 +143,15 @@ const Graphics = ({
     });
 
     //Añadir margen al rango
-    minValue = Math.max(0, minValue * 0.9);
-    maxValue = maxValue * 1.1;
+    minValue = Math.max(0, minValue * 0.6);
+    maxValue = maxValue * 1.2;
 
     //Considerar los datos actuales para el dominio
     if (patientData && patientData.length > 0) {
       patientData.forEach(record => {
         dataKeys.forEach(key => {
           if (record[key] > maxValue) {
-            maxValue = record[key * 1.1];
+            maxValue = record[key * 1.2];
           }
         });
       });
@@ -358,51 +359,53 @@ const Graphics = ({
   };
 
   return (
-    <>
-      <div className="d-flex flex-wrap align-items-center mb-4">
-        <div className="me-4">
-          <label htmlFor="graphicType" className="form-label">
-            Tipo de Gráfico
-          </label>
-          <select
-            name="graphicType"
-            id="graphicType"
-            className="form-select"
-            value={chartType}
-            onChange={(e) => setChartType(e.target.value)}
-          >
-            <option value="line">Línea</option>
-            <option value="area">Área</option>
-          </select>
-        </div>
+    <div style={{ width: '100%', height: '100%' }}>
+      
+        {options=="show" &&
+          <>
+          <div className="d-flex flex-wrap align-items-center mb-4">
+            <div className="me-4">
+              <label htmlFor="graphicType" className="form-label">
+                Tipo de Gráfico
+              </label>
+              <select
+                name="graphicType"
+                id="graphicType"
+                className="form-select"
+                value={chartType}
+                onChange={(e) => setChartType(e.target.value)}
+              >
+                <option value="line">Línea</option>
+                <option value="area">Área</option>
+              </select>
+            </div>
 
-        <div className="form-check ms-4 mt-4">
-          <input
-            type="checkbox"
-            className="form-check-input"
-            id="showRanges"
-            checked={showRanges}
-            onChange={() => setShowRanges(!showRanges)}
-          />
-          <label htmlFor="showRanges" className="form-check-label">
-            Mostrar rangos saludables
-          </label>
-        </div>
+            <div className="form-check ms-4 mt-4">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="showRanges"
+                checked={showRanges}
+                onChange={() => setShowRanges(!showRanges)}
+              />
+              <label htmlFor="showRanges" className="form-check-label">
+                Mostrar rangos saludables
+              </label>
+            </div>
 
-        <div className="form-check ms-4 mt-4">
-          <input
-            type="checkbox"
-            className="form-check-input"
-            id="showReferenceLines"
-            checked={showReferenceLines}
-            onChange={() => setShowReferenceLines(!showReferenceLines)}
-          />
-          <label htmlFor="showReferenceLines" className="form-check-label">
-            Mostrar líneas de referencia
-          </label>
-        </div>
+            <div className="form-check ms-4 mt-4">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                id="showReferenceLines"
+                checked={showReferenceLines}
+                onChange={() => setShowReferenceLines(!showReferenceLines)}
+              />
+              <label htmlFor="showReferenceLines" className="form-check-label">
+                Mostrar líneas de referencia
+              </label>
+            </div>
       </div>
-
       {alerts.length > 0 && (
         <div className="mb-4">
           {alerts.map((alert, index) => (
@@ -417,6 +420,9 @@ const Graphics = ({
           ))}
         </div>
       )}
+      </>}
+      
+    
 
       <div className="mb-4" style={{ height: "400px" }}>
         <ResponsiveContainer width="100%" height="100%">
@@ -539,7 +545,7 @@ const Graphics = ({
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
