@@ -1,6 +1,6 @@
 import React from "react";
 import ForgotForm from "../components/ForgotForm";
-import {logo} from "/src/front/assets/img/Logo.png"
+import logo from "/src/front/assets/img/Logo.png"
 
 const ForgotPassword = () => {
     return (

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import {navicon} from "/src/front/assets/img/LogoNavbar.png"
+import navicon from "/src/front/assets/img/LogoNavbar.png"
 
 export const Navbar = () => {
   return (

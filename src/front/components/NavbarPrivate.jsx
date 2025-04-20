@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {navicon} from "/src/front/assets/img/LogoNavbar.png"
+import navicon from "/src/front/assets/img/LogoNavbar.png"
 
 function NavbarPrivate() {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);

@@ -1,5 +1,5 @@
 import React from 'react';
-import {logoNavbar} from "/src/front/assets/img/LogoNavbar.png"
+import logoNavbar from "/src/front/assets/img/LogoNavbar.png"
 
 const FooterPrivate = () => {
     const currentYear = new Date().getFullYear();
