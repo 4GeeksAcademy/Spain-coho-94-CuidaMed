@@ -1,5 +1,5 @@
 import RegisterForm from "../components/RegisterForm"
-import {logo} from "/src/front/assets/img/Logo.png"
+import logo from "/src/front/assets/img/Logo.png"
 
 
 const SignUp = () => {

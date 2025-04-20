@@ -1,7 +1,7 @@
 import ResetForm from "../components/ResetForm"
 import { useParams } from 'react-router-dom'
 import React from "react"
-import {logo} from "/src/front/assets/img/Logo.png"
+import logo from "/src/front/assets/img/Logo.png"
 
 
 const ResetPassword = () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import {logoNavbar} from "/src/front/assets/img/LogoNavbar.png"
+import logoNavbar from "/src/front/assets/img/LogoNavbar.png"
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();

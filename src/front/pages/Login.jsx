@@ -1,5 +1,5 @@
 import LoginForm from "../components/LoginForm"
-import {logo} from "/src/front/assets/img/Logo.png"
+import logo from "/src/front/assets/img/Logo.png"
 
 
 const Login = () => {
