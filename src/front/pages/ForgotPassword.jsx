@@ -1,5 +1,6 @@
 import React from "react";
 import ForgotForm from "../components/ForgotForm";
+import {logo} from "/src/front/assets/img/Logo.png"
 
 const ForgotPassword = () => {
     return (
@@ -8,7 +9,7 @@ const ForgotPassword = () => {
         <div className="card border-0 shadow-lg" style={{ maxWidth: "450px", width: "100%" }}>
           <div className="card-body p-4 p-md-5">
             <div className="text-center mb-4">
-              <h1><img src="src/front/assets/img/Logo.png" className="img-fluid" /></h1>
+              <h1><img src={logo} className="img-fluid" /></h1>
               <p className="text-muted">Restablece tu contraseña</p>
             </div>
             <ForgotForm/>

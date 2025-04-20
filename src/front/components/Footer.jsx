@@ -1,5 +1,6 @@
 import React from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import {logoNavbar} from "/src/front/assets/img/LogoNavbar.png"
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -11,7 +12,7 @@ export const Footer = () => {
           <div className="col-md-4 mb-4 mb-md-0">
             <div className="d-flex align-items-center mb-2">
               <img
-                src="src/front/assets/img/LogoNavbar.png"
+                src={logoNavbar}
                 alt="CuidaMed"
                 style={{ height: '32px', width: 'auto', marginRight: '0.5rem' }}
               />
