@@ -30,6 +30,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Gallery from "./pages/Gallery";
 import MedicalDataChart from "./pages/MedicalDataChart";
+import NotFound from "./pages/NotFound";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -75,7 +76,7 @@ export const router = createBrowserRouter(
       <Route path="/forgotpassword" element={<ForgotPassword />} />
       <Route path="/resetpassword/:token" element={<ResetPassword/>}/>
       <Route path="/optionalform" element={<OptionalForm />} />
-      <Route path="/*" element={<h1>No se ha encontrado la página</h1>} />
+      <Route path="/*" element={<NotFound/>} />
     </>
   )
 );
