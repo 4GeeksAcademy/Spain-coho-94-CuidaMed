@@ -4,6 +4,9 @@ import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
 import ProgressBar from "../components/ProgressBar";
 import { useNavigate} from "react-router-dom"
+import stepOne from "/src/front/assets/img/StepOneOptionalForm.jpg"
+import stepTwo from "/src/front/assets/img/StepTwoOptionalForm.png"
+import stepThree from "/src/front/assets/img/StepThreeOptionalForm.jpg"
 
 const totalSteps = 3;
 
@@ -130,11 +133,11 @@ function OptionalForm() {
   const getStepImage = () => {
     switch (step) {
       case 1:
-        return "/src/front/assets/img/StepOneOptionalForm.jpg";
+        return stepOne;
       case 2:
-        return "/src/front/assets/img/StepTwoOptionalForm.png";
+        return stepTwo;
       case 3:
-        return "/src/front/assets/img/StepThreeOptionalForm.jpg";
+        return stepThree
       default:
         return "https://placehold.co/600x400";
     }
