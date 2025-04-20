@@ -239,7 +239,10 @@ const AllergyRecords = () => {
                                     {error.severity && <div className="invalid-feedback">{error.severity}</div>}
 
                                 </div>
-                                <button type="submit" className="btn btn-primary">Añadir registro</button>
+                                <div className="d-flex w-100 justify-content-end">
+                                   <button type="submit" className="btn btn-primary">Añadir registro</button> 
+                                </div>
+                                
                             </form>
 
                         </div>
