@@ -20,6 +20,10 @@ typing-extensions = "*"
 flask-jwt-extended = "==4.6.0"
 wtforms = "==3.1.2"
 sqlalchemy = "*"
+google-auth = "*"
+requests = "*"
+flask-mail = "*"
+itsdangerous = "*"
 boto3 = "*"
 
 [requires]

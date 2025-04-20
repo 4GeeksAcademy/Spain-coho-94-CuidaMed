@@ -11,6 +11,10 @@ import os
 import secrets
 from google.oauth2 import id_token
 from google.auth.transport import requests
+from flask_mail import Message
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from extensions import mail
+from urllib.parse import quote
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -105,3 +109,57 @@ def google_login():
 
     except ValueError:
         return jsonify({"error": "Token inválido"}), 401
+
+
+@auth_bp.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    email = request.json.get('email')
+
+    if not email:
+        return jsonify({"msg": "Email es requerido"}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    # Crear token seguro
+    s = URLSafeTimedSerializer(os.getenv('SECRET_KEY'))
+    token = s.dumps(email, salt='password-reset-salt')
+
+    # Crear URL frontend con token (asegúrate que coincida con tu front)
+    frontend_url = os.getenv("VITE_FRONTEND")
+    # quote quita los puntos del token
+    reset_url = f"{frontend_url}/resetpassword/{quote(token)}"
+
+    # Enviar email
+    msg = Message("Restablecer contraseña",
+                  recipients=[email],
+                  sender=os.getenv("MAIL_USERNAME"))
+    msg.body = f"Hola, haz clic en este enlace para cambiar tu contraseña: {reset_url}"
+    mail.send(msg)
+
+    return jsonify({"msg": "Email enviado con instrucciones"}), 200
+
+@auth_bp.route('/reset-password/<token>', methods=['POST'])
+def reset_password(token):
+    s = URLSafeTimedSerializer(os.getenv('SECRET_KEY'))
+    try:
+        email = s.loads(token, salt='password-reset-salt', max_age=3600)  # 1 hora
+    except SignatureExpired:
+        return jsonify({"msg": "Token expirado"}), 400
+    except BadSignature:
+        return jsonify({"msg": "Token inválido"}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    new_password = request.json.get("password")
+
+    if not new_password:
+        return jsonify({"msg": "Contraseña requerida"}), 400
+
+    user.set_password(new_password)
+    db.session.commit()
+
+    return jsonify({"msg": "Contraseña actualizada correctamente"}), 200

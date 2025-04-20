@@ -1,1 +1,1 @@
-from .routes import signup, login, google_login
+from .routes import signup, login, google_login, forgot_password, reset_password

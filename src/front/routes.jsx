@@ -26,6 +26,8 @@ import Dashboard from "./pages/Dashboard";
 import { LayoutPrivate } from "./pages/LayoutPrivate";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Gallery from "./pages/Gallery";
 import MedicalDataChart from "./pages/MedicalDataChart";
 
@@ -62,7 +64,6 @@ export const router = createBrowserRouter(
           element={<PersonalAntecedentRecords />}
         />
         <Route path="/records/medication" element={<MedicationRecords />} />
-        <Route path="/optionalform" element={<OptionalForm />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/gallery" element={<Gallery />} />
@@ -71,6 +72,9 @@ export const router = createBrowserRouter(
 
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
+      <Route path="/forgotpassword" element={<ForgotPassword />} />
+      <Route path="/resetpassword/:token" element={<ResetPassword/>}/>
+      <Route path="/optionalform" element={<OptionalForm />} />
       <Route path="/*" element={<h1>No se ha encontrado la página</h1>} />
     </>
   )
