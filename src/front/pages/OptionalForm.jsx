@@ -130,11 +130,11 @@ function OptionalForm() {
   const getStepImage = () => {
     switch (step) {
       case 1:
-        return "src/front/assets/img/StepOneOptionalForm.jpg";
+        return "/src/front/assets/img/StepOneOptionalForm.jpg";
       case 2:
-        return "src/front/assets/img/StepTwoOptionalForm.png";
+        return "/src/front/assets/img/StepTwoOptionalForm.png";
       case 3:
-        return "src/front/assets/img/StepThreeOptionalForm.jpg";
+        return "/src/front/assets/img/StepThreeOptionalForm.jpg";
       default:
         return "https://placehold.co/600x400";
     }

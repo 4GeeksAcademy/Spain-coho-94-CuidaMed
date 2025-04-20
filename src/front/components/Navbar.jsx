@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import {navicon} from "/src/front/assets/img/LogoNavbar.png"
 
 export const Navbar = () => {
   return (
@@ -6,7 +7,7 @@ export const Navbar = () => {
       <div className="container">
         <Link className="navbar-brand d-flex align-items-center" to="/">
           <img
-            src="src/front/assets/img/LogoNavbar.png"
+            src={navicon}
             style={{ width: "150px" }}
           />
         </Link>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import {navicon} from "/src/front/assets/img/LogoNavbar.png"
 
 function NavbarPrivate() {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -18,7 +19,7 @@ function NavbarPrivate() {
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm ">
       <div className="container">
         <Link to="/dashboard" className="navbar-brand d-flex align-items-center">
-          <img src="src/front/assets/img/LogoNavbar.png" className="w-25"/>
+          <img src={navicon} className="w-25"/>
         </Link>
 
         <button
