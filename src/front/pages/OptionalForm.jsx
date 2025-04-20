@@ -622,7 +622,7 @@ function OptionalForm() {
               width: "100%",
               height: "100%",
               backgroundColor: "#eaf4fb",
-              backgroundImage: "url(src/front/assets/img/patronfondo.png)",
+              backgroundImage: "url(/public/images/patronfondo.png)",
               backgroundRepeat: "repeat",
               backgroundSize: "auto",
               opacity: 0.2,
