@@ -20,7 +20,7 @@ const CurrentMedication = ({currentMedication}) => {
                 }
             </div>
             <div className="card-footer bg-white">
-              <Link href="/records/medication" className="btn btn-outline-primary">
+              <Link to="/records/medication" className="btn btn-outline-primary">
                 Ir a tratamientos
               </Link>
             </div>

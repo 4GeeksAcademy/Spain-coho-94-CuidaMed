@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import ScrollToTop from "../components/ScrollToTop";
 import NavbarPrivate from "../components/NavbarPrivate";
 import Submenu from "../components/Submenu";
-import { Footer } from "../components/Footer";
+import FooterPrivate from "../components/FooterPrivate";
 import ErrorModal from "../components/ErrorModal";
 
 // Base component that maintains the navbar and footer throughout the page and the scroll to top functionality.
@@ -21,10 +21,14 @@ export const LayoutPrivate = () => {
   return (
     <>
       <ScrollToTop>
-        <NavbarPrivate />
-        <Submenu />
-        <Outlet />
-        <Footer />
+        <div className="d-flex flex-column min-vh-100">
+          <NavbarPrivate />
+          <Submenu />
+          <main className="flex-grow-1">
+            <Outlet />
+          </main>
+          <FooterPrivate />
+        </div>
       </ScrollToTop>
 
       {showModalToken && (

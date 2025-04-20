@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import medicalform from "../assets/img/medical-enrollment-form-document-medicare-concept.jpeg"
+import GlucoseChart from "/src/front/assets/img/GlucoseChart.png"
 
 const LandingPage = () => {
     return (
@@ -29,7 +30,7 @@ const LandingPage = () => {
                                 control de tu bienestar con nuestra plataforma gratuita de
                                 gestión de salud.
                             </p>
-                            <Link to="/register" className="btn btn-primary btn-lg mt-3">
+                            <Link to="/signup" className="btn btn-primary btn-lg mt-3">
                                 Pruébalo gratis <i className="fas fa-arrow-right ms-2"></i>
                             </Link>
                         </div>
@@ -153,7 +154,7 @@ const LandingPage = () => {
                                 </div>
 
                                 <img
-                                    src="src/front/assets/img/medical-enrollment-form-document-medicare-concept.jpeg"
+                                    src={GlucoseChart}
                                     alt="HealthTrack app demo"
                                     className="img-fluid rounded-top"
                                     style={{ marginTop: "2rem" }}
