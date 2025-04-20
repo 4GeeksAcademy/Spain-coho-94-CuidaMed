@@ -84,6 +84,9 @@ const WeightRecords = () => {
         if (!formData.weightValue) {
             newErrors.weightValue = "Por favor, introduzca un peso"
             valid = false
+        } else if(formData.weightValue < 0){
+            newErrors.weightValue = "El valor de peso no puede ser negativo"
+            valid = false
         }
 
         if (!formData.measurementDate) {
