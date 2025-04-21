@@ -1,4 +1,5 @@
 import React from 'react';
+import logoNavbar from "/src/front/assets/img/LogoNavbar.png"
 
 const FooterPrivate = () => {
     const currentYear = new Date().getFullYear();
@@ -11,7 +12,7 @@ const FooterPrivate = () => {
                         <div className="col-md-4 mb-3 mb-md-0">
                             <div className="d-flex align-items-center mb-2">
                                 <img 
-                                    src="src/front/assets/img/LogoNavbar.png" 
+                                    src={logoNavbar} 
                                     alt="CuidaMed"
                                     style={{height: '24px', width: 'auto', marginRight: '0.5rem'}} 
                                 />

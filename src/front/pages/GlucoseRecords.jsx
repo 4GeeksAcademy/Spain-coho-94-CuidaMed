@@ -80,6 +80,9 @@ const GlucoseRecords = () => {
         if (!formData.glucoseValue) {
             newErrors.glucoseValue = "Por favor, introduzca un valor de glucosa"
             valid = false
+        }else if(formData.glucoseValue < 0){
+            newErrors.glucoseValue = "El valor de glucosa no puede ser negativo"
+            valid = false
         }
 
         if (!formData.measurementDate) {

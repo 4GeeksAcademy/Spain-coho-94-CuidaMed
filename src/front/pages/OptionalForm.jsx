@@ -4,6 +4,9 @@ import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
 import ProgressBar from "../components/ProgressBar";
 import { useNavigate} from "react-router-dom"
+import stepOne from "/src/front/assets/img/StepOneOptionalForm.jpg"
+import stepTwo from "/src/front/assets/img/StepTwoOptionalForm.png"
+import stepThree from "/src/front/assets/img/StepThreeOptionalForm.jpg"
 
 const totalSteps = 3;
 
@@ -130,11 +133,11 @@ function OptionalForm() {
   const getStepImage = () => {
     switch (step) {
       case 1:
-        return "src/front/assets/img/StepOneOptionalForm.jpg";
+        return stepOne;
       case 2:
-        return "src/front/assets/img/StepTwoOptionalForm.png";
+        return stepTwo;
       case 3:
-        return "src/front/assets/img/StepThreeOptionalForm.jpg";
+        return stepThree
       default:
         return "https://placehold.co/600x400";
     }
@@ -607,31 +610,18 @@ function OptionalForm() {
   };
 
   return (
-    <div className="vh-100 d-flex flex-column">
-      <div className="flex-grow-1 d-flex">
-        <div className="w-50 overflow-auto position-relative">
+    <div className="container-fluid min-vh-100 d-flex flex-column">
+      <div className="row flex-grow-1">
+        <div className="col-12 col-md-6 position-relative overflow-auto">
           <div
             className="background-pattern"
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "#eaf4fb",
-              backgroundImage: "url(src/front/assets/img/patronfondo.png)",
-              backgroundRepeat: "repeat",
-              backgroundSize: "auto",
-              opacity: 0.2,
-              zIndex: -1,
-            }}
           ></div>
-          <div className="container-fluid py-4 max-width-md mx-auto">
+          <div className="container py-4 ">
             {renderSteps()}
           </div>
         </div>
 
-        <div className="w-50 bg-info position-relative">
+        <div className="d-none d-md-block col-md-6 p-0">
           <img
             src={getStepImage()}
             alt={`Imagen paso ${step}`}

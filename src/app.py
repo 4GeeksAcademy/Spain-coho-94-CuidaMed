@@ -15,6 +15,8 @@ from api.records import records_blueprint
 from api.admin import setup_admin
 from api.commands import setup_commands
 from flask_cors import CORS
+from extensions import mail
+
 import os
 from flask_jwt_extended import JWTManager
 import datetime
@@ -22,8 +24,7 @@ import datetime
 # from models import Person
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
-static_file_dir = os.path.join(os.path.dirname(
-    os.path.realpath(__file__)), '../public/')
+static_file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../dist/')
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
@@ -72,6 +73,16 @@ app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 # Allow CORS requests to this API
 CORS(app)
 
+# Configuración del email para restablecer contraseña
+app.config['MAIL_SERVER'] = os.getenv("MAIL_SERVER")
+app.config['MAIL_PORT'] = os.getenv("MAIL_PORT")
+app.config['MAIL_USE_TLS'] = os.getenv("MAIL_USE_TLS") == 'True'
+app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
+app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")  # Para generar el token
+
+# Inicializar extensión de Mail
+mail.init_app(app)
 
 # Handle/serialize errors like a JSON object
 #Tengamos algún cambio
@@ -92,7 +103,7 @@ def sitemap():
 
 # any other endpoint will try to serve it like a static file
 
-
+#@app.route('/', defaults={'path': ''})
 @app.route('/<path:path>', methods=['GET'])
 def serve_any_other_file(path):
     if not os.path.isfile(os.path.join(static_file_dir, path)):
@@ -106,3 +117,4 @@ def serve_any_other_file(path):
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
     app.run(host='0.0.0.0', port=PORT, debug=True)
+

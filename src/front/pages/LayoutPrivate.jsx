@@ -25,6 +25,8 @@ export const LayoutPrivate = () => {
           <NavbarPrivate />
           <Submenu />
           <main className="flex-grow-1">
+            <div className="background-pattern">
+            </div>
             <Outlet />
           </main>
           <FooterPrivate />

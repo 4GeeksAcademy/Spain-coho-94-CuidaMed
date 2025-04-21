@@ -1,5 +1,6 @@
 import React from 'react';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import logoNavbar from "/src/front/assets/img/LogoNavbar.png"
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -11,7 +12,7 @@ export const Footer = () => {
           <div className="col-md-4 mb-4 mb-md-0">
             <div className="d-flex align-items-center mb-2">
               <img
-                src="src/front/assets/img/LogoNavbar.png"
+                src={logoNavbar}
                 alt="CuidaMed"
                 style={{ height: '32px', width: 'auto', marginRight: '0.5rem' }}
               />
@@ -55,11 +56,6 @@ export const Footer = () => {
             <p className="text-muted small mb-0">
               Gestión segura de tu salud. Toma el control de tu bienestar con nuestra plataforma.
             </p>
-          </div>
-          <div className="col-md-4 text-md-end">
-            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="text-muted me-3"><i className="bi bi-facebook"></i></a>
-            <a href="https://x.com" target="_blank" rel="noopener noreferrer"  className="text-muted me-3"><i className="bi bi-twitter"></i></a>
-            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" className="text-muted"><i className="bi bi-instagram"></i></a>
           </div>
         </div>
       </div>

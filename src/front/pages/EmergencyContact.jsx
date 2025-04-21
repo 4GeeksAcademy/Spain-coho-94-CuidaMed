@@ -191,6 +191,7 @@ const EmergencyContact = () => {
             setError({...error, form: error.message })
         } finally {
             setLoading(false)
+            setButtonLabel("Modificar contacto")
         }
     }
 

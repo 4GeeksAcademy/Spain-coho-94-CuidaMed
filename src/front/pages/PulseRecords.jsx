@@ -85,6 +85,9 @@ const PulseRecords = () => {
         if (!formData.pulseValue) {
             newErrors.pulseValue = "Por favor, introduzca un valor"
             valid = false
+        } else if(formData.pulseValue < 0){
+            newErrors.pulseValue = "El valor de pulso no puede ser negativo"
+            valid = false
         }
 
         if (!formData.measurementDate) {

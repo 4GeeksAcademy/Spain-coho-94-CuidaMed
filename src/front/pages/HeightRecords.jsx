@@ -82,9 +82,16 @@ const HeightRecords = () => {
         const selectedDate = new Date(formData.measurementDate);
 
         if (!formData.heightValue) {
-            newErrors.heightValue = "Por favor, introduzca una altura"
-            valid = false
+            newErrors.heightValue = "Por favor, introduzca una altura";
+            valid = false;
+        } else if (formData.heightValue < 0) {
+            newErrors.heightValue = "La altura no puede ser negativa";
+            valid = false;
+        } else if (formData.heightValue < 0.4 || formData.heightValue > 3) {
+            newErrors.heightValue = "Por favor, introduzca una altura entre 0.4 y 3 metros";
+            valid = false;
         }
+          
 
         if (!formData.measurementDate) {
             newErrors.measurementDate = "Por favor, seleccione una fecha de medición"
@@ -223,6 +230,7 @@ const HeightRecords = () => {
                                             aria-describedby="heightValue"
                                             value={formData.heightValue}
                                             onChange={handleChange}
+                                            placeholder="Ejemplo: 1.65"
                                         />
                                         <span className="input-group-text" >metros</span>
                                         {error.heightValue && <div className="invalid-feedback">{error.heightValue}</div>}
