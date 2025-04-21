@@ -40,16 +40,16 @@ const Profile = () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
     const accessToken = localStorage.getItem("accessToken");
 
-    useEffect(() => {
-        const toISODateFormat = (fecha) => {
-            if (fecha) {
-                const [day, month, year] = fecha.split("-");
-                return `${year}-${month}-${day}`;
-            } else {
-                return undefined
-            }
+    const toISODateFormat = (fecha) => {
+        if (fecha) {
+            const [day, month, year] = fecha.split("-");
+            return `${year}-${month}-${day}`;
+        } else {
+            return undefined
+        }
+    };
 
-        };
+    useEffect(() => {
         const fetchRecordData = async () => {
             try {
                 const response = await fetch(`${backendUrl}/api/users/general-data`,
@@ -137,30 +137,38 @@ const Profile = () => {
             valid = false
         } else if (formData.fullName.trim().length < 6) {
             newErrors.fullName = "El nombre debe tener un mínimo de 6 caracteres";
+            valid = false
         } else if (!/^[\p{L}\s'-]+$/u.test(formData.fullName)) {
             newErrors.fullName = "El nombre solo debe contener letras";
+            valid = false
         }
 
         if (!formData.phone) {
             newErrors.phone = "Número de teléfono requerido";
+            valid = false
         } else {
             const cleanPhone = formData.phone.replace(/\s/g, ''); // Esta línea elimina espacios para la validación
             if (!cleanPhone.startsWith("+")) {
                 newErrors.phone = "El número debe comenzar con '+' (Ejemplo: +34222331144)";
+                valid = false
             } else if (!/^\+\d{11}$/.test(cleanPhone)) {
                 newErrors.phone = "El número debe tener 12 caracteres (Ejemplo: +34XXXXXXXXX)";
+                valid = false
             }
         }
         if (!formData.birthDate) {
             newErrors.birthDate = "Fecha de nacimiento requerida";
+            valid = false
         } else {
             const birthDate = new Date(formData.birthDate);
             const today = new Date();
 
             if (isNaN(birthDate.getTime())) {
                 newErrors.birthDate = "Fecha inválida";
+                valid = false
             } else if (birthDate > today) {
                 newErrors.birthDate = "La fecha no puede ser en el futuro";
+                valid = false
             } else {
                 const age = today.getFullYear() - birthDate.getFullYear();
                 const monthDiff = today.getMonth() - birthDate.getMonth();
@@ -168,30 +176,38 @@ const Profile = () => {
                 setAge(finalAge)
             }
         }
-        if (formData.sex === "") newErrors.sex = "Por favor selecciona una opción";
-        if (formData.height) {
-            const heightValue = parseFloat(formData.height.toString().replace(',', '.'));//Me aseguro de las comas se transformen en punto para el parseFloat
+        if (formData.gender === "") {
+            newErrors.gender = "Por favor selecciona una opción";
+            valid = false
+        }
+        if (formData.lastHeight) {
+            const heightValue = parseFloat(formData.lastHeight.toString().replace(',', '.'));//Me aseguro de las comas se transformen en punto para el parseFloat
 
             if (isNaN(heightValue) || heightValue <= 0 || heightValue > 3) {
                 newErrors.height = "Ingresa una altura válida (entre 0 y 3 metros)";
+                valid = false
             }
         }
 
-        if (formData.weight) {
-            const weightValue = parseFloat(formData.weight.toString().replace(',', '.'));
+        if (formData.lastWeight) {
+            const weightValue = parseFloat(formData.lastWeight.toString().replace(',', '.'));
 
             if (isNaN(weightValue) || weightValue <= 0 || weightValue > 500) {
                 newErrors.weight = "Ingresa un peso válido (entre 0 y 500 kg)";
+                valid = false
             }
         }
 
         if (formData.dietaryPreferences) {
             if (formData.dietaryPreferences.trim() === "") {
                 newErrors.dietaryPreferences = "No puedes completar esta sección sólo con espacios"
+                valid = false
             } else if (formData.dietaryPreferences.length > 100) {
                 newErrors.dietaryPreferences = "La respuesta no puede contener más de 100 caracteres"
+                valid = false
             } else if (!/^[\p{L}\s,;.-]+$/u.test(formData.dietaryPreferences)) { // Permitir letras, espacios, comas, puntos, guiones y punto y coma
                 newErrors.dietaryPreferences = "El campo solo debe contener letras";
+                valid = false
             }
         }
         setError(newErrors)
@@ -238,15 +254,15 @@ const Profile = () => {
                     "Authorization": `Bearer ${accessToken}`
                 },
                 body: JSON.stringify({
-                    name: formData.fullName,
-                    birth_date: formattedDate,
-                    phone: formData.phone,
-                    gender: formData.gender,
-                    last_weight: formData.lastWeight,
-                    last_height: formData.lastHeight,
-                    blood_type: formData.bloodType,
-                    dietary_preferences: formData.dietaryPreferences,
-                    physical_activity: formData.physicalActivity,
+                    name: formData.fullName || "",
+                    birth_date: formData.birthDate || "",
+                    phone: formData.phone || "",
+                    gender: formData.gender || "",
+                    last_weight: formData.lastWeight || "",
+                    last_height: formData.lastHeight || "",
+                    blood_type: formData.bloodType || "",
+                    dietary_preferences: formData.dietaryPreferences || "",
+                    physical_activity: formData.physicalActivity || "",
                 })
             })
 
@@ -269,6 +285,8 @@ const Profile = () => {
                     physicalActivity: data.general_data.physical_activity,
                 }
             );
+
+            setShowSuccessModal(true)
 
         } catch (error) {
             setError(error.message)
@@ -514,7 +532,7 @@ const Profile = () => {
                         </div>
                         <div className="d-flex justify-content-end ">
                             <button type="button" className="btn btn-danger me-3" onClick={handleModal}>Eliminar perfil</button>
-                            <button type="submit" className="btn btn-primary" onClick={handleSuccess}>Actualizar perfil</button>
+                            <button type="submit" className="btn btn-primary">Actualizar perfil</button>
                         </div>
                         <SuccessModal
                             showSuccessModal={showSuccessModal}
