@@ -329,7 +329,7 @@ const EmergencyContact = () => {
                             <h5 className="m-0">Contacto de emegencia</h5>
                             <button 
                                 type="button" 
-                                className="btn text-white"
+                                className="btn text-white p-0"
                                 onClick={handleDelete}
                             >
                                 <i className="fa-solid fa-trash"></i>
