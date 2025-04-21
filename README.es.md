@@ -1,81 +1,140 @@
-# Plantilla de WebApp con React JS y Flask API
+🏥 CuidaMed: Gestión segura de tu salud.
+---
+CuidaMed es una plataforma innovadora gratuita de gestión de salud que te permite guardar y consultar tu información médica de forma segura, a través de una interfaz intuitiva.
 
-Construye aplicaciones web usando React.js para el front end y python/flask para tu API backend.
+---
+✨ Características Principales.
+---
 
-- La documentación se puede encontrar aquí: https://4geeks.com/docs/start/react-flask-template
-- Aquí hay un video sobre [cómo usar esta plantilla](https://www.youtube.com/watch?v=qBz6Ddd2m38)
-- Integrado con Pipenv para la gestión de paquetes.
-- Despliegue rápido a Render [en solo unos pocos pasos aquí](https://4geeks.com/es/docs/start/despliega-con-render-com).
-- Uso del archivo .env.
-- Integración de SQLAlchemy para la abstracción de bases de datos.
+* 📊 Estadísticas de salud: Visualiza datos importantes como tensión arterial, pulso, glucosa y peso con rangos de normalidad, advertencia y peligro.
 
-### 1) Instalación:
+* 📁 Historial médico completo: Almacena y accede fácilmente a tu historial de salud.
+
+* 🆘 Contacto de emergencia: Contacta rápidamente con tu contacto de emergencia a través de un QR personalizado.
+
+* 🖼️ Galería de informes: Almacena y visualiza radiografías, exámenes y otros documentos médicos, en un solo lugar.
+
+* 🔒 Acceso seguro: Protección de datos mediante autenticación con Google.
+
+* 💯 Totalmente gratuito: Accede a todas las funciones sin costo alguno.
+
+---
+👤 Tipos de Roles
+---
+📱 Usuarios
+
+Actualmente disponible solo el rol de usuario. Las personas que utilizan la plataforma para gestionar su información médica personal.
+Próximamente se añadirán roles adicionales.
+
+---
+🛠️ Tecnologías Utilizadas
+---
+Frontend
+---
+
+* React ⚛️
+* Bootstrap 🎨 (diseño responsive)
+* Librerías:
+
+    * qrcode-react
+    * recharts
+    * iconos de Bootstrap
+    * jwt-decode
+
+---
+Backend
+---
+
+* Python 🐍
+* Flask 🌶️
+* SQLAlchemy 🗃️
+* Tigrisdata (para la galeria de informes)
+* flask-email (para envío de correos)
+* itsdangerous
+* python-dotenv 
+
+---
+Autenticación
+---
+
+* Google Auth 🔐
+  
+---
+🚀 Instalación
+---
 
 > Si usas Github Codespaces (recomendado) o Gitpod, esta plantilla ya vendrá con Python, Node y la base de datos Posgres instalados. Si estás trabajando localmente, asegúrate de instalar Python 3.10, Node.
 
+🛠️ Configuración del Backend:
+---
+
 Se recomienda instalar el backend primero, asegúrate de tener Python 3.10, Pipenv y un motor de base de datos (se recomienda Posgres).
 
-1. Instala los paquetes de python: `$ pipenv install`
-2. Crea un archivo .env basado en el .env.example: `$ cp .env.example .env`
-3. Instala tu motor de base de datos y crea tu base de datos, dependiendo de tu base de datos, debes crear una variable DATABASE_URL con uno de los valores posibles, asegúrate de reemplazar los valores con la información de tu base de datos:
+1.- Instala los paquetes de python: 
 
-| Motor     | DATABASE_URL                                        |
+$ pipenv install
+
+2.- Crea un archivo .env basado en el .env.example:
+
+$ cp .env.example .env
+
+3.- Instala tu motor de base de datos y crea tu base de datos, dependiendo de tu base de datos, debes crear una variable DATABASE_URL con uno de los valores posibles, asegúrate de reemplazar los valores con la información de tu base de datos:
+
+| Engine    | DATABASE_URL                                        |
 | --------- | --------------------------------------------------- |
 | SQLite    | sqlite:////test.db                                  |
 | MySQL     | mysql://username:password@localhost:port/example    |
-| Postgres  | postgres://username:password@localhost:5432/example |
+| Postgress | postgres://username:password@localhost:5432/example |
 
-4. Migra las migraciones: `$ pipenv run migrate` (omite si no has hecho cambios en los modelos en `./src/api/models.py`)
-5. Ejecuta las migraciones: `$ pipenv run upgrade`
-6. Ejecuta la aplicación: `$ pipenv run start`
+4.- Migra las migraciones:
 
-> Nota: Los usuarios de Codespaces pueden conectarse a psql escribiendo: `psql -h localhost -U gitpod example`
+$ pipenv run migrate
+(omite si no has hecho cambios en los modelos en ./src/api/models.py)
 
-### Deshacer una migración
+5.- Ejecuta las migraciones:
+
+$ pipenv run upgrade
+
+6.- Ejecuta la aplicación:
+
+$ pipenv run start
+
+> Nota: Los usuarios de Codespaces pueden conectarse a psql escribiendo: psql -h localhost -U gitpod example
+
+> Deshacer una migración
 
 También puedes deshacer una migración ejecutando
 
-```sh
 $ pipenv run downgrade
-```
 
-### Población de la tabla de usuarios en el backend
+---
+🛠️ Configuración manual del Frontend:
+---
 
-Para insertar usuarios de prueba en la base de datos, ejecuta el siguiente comando:
+* Asegúrate de estar usando la versión 20 de node y de que ya hayas instalado y ejecutado correctamente el backend
 
-```sh
-$ flask insert-test-users 5
-```
+1.- Instala los paquetes: 
 
-Y verás el siguiente mensaje:
+$ npm install
 
-```
-    Creating test users
-    test_user1@test.com created.
-    test_user2@test.com created.
-    test_user3@test.com created.
-    test_user4@test.com created.
-    test_user5@test.com created.
-    Users created successfully!
-```
+2.- ¡Empieza a codificar! inicia el servidor de desarrollo de webpack 
 
-### **Nota importante para la base de datos y los datos dentro de ella**
+$ npm run start
 
-Cada entorno de Github Codespace tendrá **su propia base de datos**, por lo que si estás trabajando con más personas, cada uno tendrá una base de datos diferente y diferentes registros dentro de ella. Estos datos **se perderán**, así que no pases demasiado tiempo creando registros manualmente para pruebas, en su lugar, puedes automatizar la adición de registros a tu base de datos editando el archivo ```commands.py``` dentro de la carpeta ```/src/api```. Edita la línea 32 de la función ```insert_test_data``` para insertar los datos según tu modelo (usa la función ```insert_test_users``` anterior como ejemplo). Luego, todo lo que necesitas hacer es ejecutar ```pipenv run insert-test-data```.
+---
+👥 Sobre Nosotros
+---
 
-### Instalación manual del Front-End:
+CuidaMed ha sido creado con dedicación por un equipo de estudiantes apasionados por la programación. Combinando nuestras habilidades y conocimientos, hemos dado vida a esta plataforma innovadora que busca transformar la manera en que gestionamos y guardamos toda nuestra información de salud.
 
--   Asegúrate de estar usando la versión 20 de node y de que ya hayas instalado y ejecutado correctamente el backend.
+👩‍💻 MichPisani: https://github.com/MichPisani
 
-1. Instala los paquetes: `$ npm install`
-2. ¡Empieza a codificar! inicia el servidor de desarrollo de webpack `$ npm run start`
+👩‍💻 Leodelis: https://github.com/Leodelis
 
-## ¡Publica tu sitio web!
+👨‍💻 PipeBarros: https://github.com/InTheScencia 
 
-Esta plantilla está 100% lista para desplegarse con Render.com y Heroku en cuestión de minutos. Por favor, lee la [documentación oficial al respecto](https://4geeks.com/docs/start/deploy-to-render-com).
+---
+💻 Contribuyentes
+---
+Esta plantilla fue construida como parte del Coding Bootcamp de 4Geeks Academy por Alejandro Sanchez y muchos otros contribuyentes. Descubre más sobre nuestro Curso de Desarrollador Full Stack y Bootcamp de Ciencia de Datos.
 
-### Contribuyentes
-
-Esta plantilla fue construida como parte del [Coding Bootcamp](https://4geeksacademy.com/us/coding-bootcamp) de 4Geeks Academy por [Alejandro Sanchez](https://twitter.com/alesanchezr) y muchos otros contribuyentes. Descubre más sobre nuestro [Curso de Desarrollador Full Stack](https://4geeksacademy.com/us/coding-bootcamps/part-time-full-stack-developer) y [Bootcamp de Ciencia de Datos](https://4geeksacademy.com/us/coding-bootcamps/datascience-machine-learning).
-
-Puedes encontrar otras plantillas y recursos como este en la [página de github de la escuela](https://github.com/4geeksacademy/).
