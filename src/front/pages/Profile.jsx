@@ -6,15 +6,15 @@ import SuccessModal from "../components/SuccessModal";
 const Profile = () => {
     const navigate = useNavigate()
     const [formData, setFormData] = useState({
-        fullName: " ",
+        fullName: "",
         birthDate: undefined,
-        phone: " ",
+        phone: "",
         lastWeight: undefined,
         lastHeight: undefined,
         BMI: undefined,
         gender: undefined,
         bloodType: undefined,
-        dietaryPreferences: " ",
+        dietaryPreferences: "",
         physicalActivity: undefined,
     }
     )
