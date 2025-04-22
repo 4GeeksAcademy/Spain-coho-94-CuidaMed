@@ -326,6 +326,7 @@ const BloodPressureRecords = () => {
                                     <th scope="col" style={{ width: "100px" }}>Diastólica (mm/Hg)</th>
                                     <th scope="col" style={{ width: "200px" }}>Fecha de medición</th>
                                     <th scope="col" style={{ width: "250px" }}>Comentario</th>
+                                    <th></th>
                                 </tr></thead>
                                 <tbody>
                                     {sortedHistory && sortedHistory.slice((currentPage - 1) * 7, currentPage * 7).map((data) => {
@@ -335,7 +336,7 @@ const BloodPressureRecords = () => {
                                                 <td >{data.diastolicValue}</td>
                                                 <td >{data.measurementDate}</td>
                                                 <td >{data.comments}</td>
-                                                <td><button className="btn" onClick={()=>handleDelete(data.recordId)}><i className="text-danger fa-solid fa-trash"></i></button></td>
+                                                <td ><button className="btn" onClick={()=>handleDelete(data.recordId)}><i className="text-danger fa-solid fa-trash"></i></button></td>
                                             </tr>
                                         )
                                     })}
