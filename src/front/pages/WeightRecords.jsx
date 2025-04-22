@@ -70,6 +70,8 @@ const WeightRecords = () => {
             );
             setSortedHistory(sorted);
             
+        }else{
+            setSortedHistory(weightHistory)
         }
     }, [weightHistory]);
 
