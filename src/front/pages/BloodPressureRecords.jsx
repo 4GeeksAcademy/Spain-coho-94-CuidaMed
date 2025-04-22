@@ -72,6 +72,8 @@ const BloodPressureRecords = () => {
             );
             setSortedHistory(sorted);
             
+        }else {
+            setSortedHistory(bloodPressureHistory);
         }
     }, [bloodPressureHistory]);
 
