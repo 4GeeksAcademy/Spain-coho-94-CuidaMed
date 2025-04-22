@@ -6,7 +6,7 @@ const FooterPrivate = () => {
 
     return (
         <>
-            <footer className="w-100 py-4 bg-white border-top border-secondary-subtle">
+            <footer className="w-100 py-4 bg-white border-top border-secondary-subtle mt-4">
                 <div className="container">
                     <div className="row align-items-center justify-content-between">
                         <div className="col-md-4 mb-3 mb-md-0">
