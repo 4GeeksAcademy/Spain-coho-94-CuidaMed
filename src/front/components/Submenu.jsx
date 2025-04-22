@@ -29,15 +29,15 @@ const Submenu = () => {
               Registros
             </button>
             <ul className="dropdown-menu">
-              <li><Link to="/records/bloodpressure" className="dropdown-item"><i className="fa-solid fa-heart me-2"></i> Tensión arterial</Link></li>
-              <li><Link to="/records/pulse" className="dropdown-item"><i className="fa-solid fa-heart-pulse me-2"></i> Pulso</Link></li>
-              <li><Link to="/records/glucose" className="dropdown-item"><i className="fa-solid fa-syringe me-2"></i> Glucosa</Link></li>
-              <li><Link to="/records/weight" className="dropdown-item"><i className="fa-solid fa-weight-scale me-2"></i> Peso</Link></li>
-              <li><Link to="/records/height" className="dropdown-item"><i className="fa-solid fa-ruler-vertical me-2"></i> Altura</Link></li>
-              <li><Link to="/records/allergies" className="dropdown-item"><i className="fa-solid fa-triangle-exclamation me-2"></i> Alergias</Link></li>
-              <li><Link to="/records/familyhistory" className="dropdown-item"><i className="fa-solid fa-users me-2"></i> Antecedentes familiares</Link></li>
-              <li><Link to="/records/personalhistory" className="dropdown-item"><i className="fa-solid fa-user me-2"></i> Antecedentes personales</Link></li>
-              <li><Link to="/records/medication" className="dropdown-item"><i className="fa-solid fa-pills me-2"></i> Tratamientos</Link></li>
+              <li><Link to="/records/bloodpressure" className="dropdown-item"><i className="fa-solid fa-heart me-3" style={{width:"16px", height:"16px"}}></i> Tensión arterial</Link></li>
+              <li><Link to="/records/pulse" className="dropdown-item"><i className="fa-solid fa-heart-pulse me-3" style={{width:"16px", height:"16px"}}></i> Pulso</Link></li>
+              <li><Link to="/records/glucose" className="dropdown-item"><i className="fa-solid fa-syringe me-3" style={{width:"16px", height:"16px"}}></i> Glucosa</Link></li>
+              <li><Link to="/records/weight" className="dropdown-item"><i className="fa-solid fa-weight-scale me-3" style={{width:"16px", height:"16px"}}></i> Peso</Link></li>
+              <li><Link to="/records/height" className="dropdown-item"><i className="fa-solid fa-ruler-vertical me-3" style={{width:"16px", height:"16px"}}></i> Altura</Link></li>
+              <li><Link to="/records/allergies" className="dropdown-item"><i className="fa-solid fa-triangle-exclamation me-3" style={{width:"16px", height:"16px"}}></i> Alergias</Link></li>
+              <li><Link to="/records/familyhistory" className="dropdown-item"><i className="fa-solid fa-users me-3" style={{width:"16px", height:"16px"}}></i> Antecedentes familiares</Link></li>
+              <li><Link to="/records/personalhistory" className="dropdown-item"><i className="fa-solid fa-user me-3" style={{width:"16px", height:"16px"}}></i> Antecedentes personales</Link></li>
+              <li><Link to="/records/medication" className="dropdown-item"><i className="fa-solid fa-pills me-3" style={{width:"16px", height:"16px"}}></i> Tratamientos</Link></li>
             </ul>
           </div>
 
@@ -51,10 +51,10 @@ const Submenu = () => {
               Estadísticas
             </button>
             <ul className="dropdown-menu">
-              <li><Link to="/statistics/bloodpressure" className="dropdown-item"><i className="fa-solid fa-heart me-2"></i> Tensión arterial</Link></li>
-              <li><Link to="/statistics/pulse" className="dropdown-item"><i className="fa-solid fa-heart-pulse me-2"></i> Pulso</Link></li>
-              <li><Link to="/statistics/glucose" className="dropdown-item"><i className="fa-solid fa-syringe me-2"></i> Glucosa</Link></li>
-              <li><Link to="/statistics/weight" className="dropdown-item"><i className="fa-solid fa-weight-scale me-2"></i> Peso</Link></li>
+              <li><Link to="/statistics/bloodpressure" className="dropdown-item"><i className="fa-solid fa-heart me-3"></i> Tensión arterial</Link></li>
+              <li><Link to="/statistics/pulse" className="dropdown-item"><i className="fa-solid fa-heart-pulse me-3"></i> Pulso</Link></li>
+              <li><Link to="/statistics/glucose" className="dropdown-item"><i className="fa-solid fa-syringe me-3"></i> Glucosa</Link></li>
+              <li><Link to="/statistics/weight" className="dropdown-item"><i className="fa-solid fa-weight-scale me-3"></i> Peso</Link></li>
             </ul>
           </div>
 
