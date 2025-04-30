@@ -70,6 +70,8 @@ const PulseRecords = () => {
             );
             setSortedHistory(sorted);
             
+        }else{
+            setSortedHistory(pulseHistory)
         }
     }, [pulseHistory]);
 

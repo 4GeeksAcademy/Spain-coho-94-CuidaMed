@@ -71,6 +71,8 @@ const HeightRecords = () => {
             );
             setSortedHistory(sorted);
             
+        }else{
+            setSortedHistory(heightHistory)
         }
     }, [heightHistory]);
     const validateForm = () => {

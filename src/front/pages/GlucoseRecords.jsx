@@ -66,6 +66,8 @@ const GlucoseRecords = () => {
             );
             setSortedHistory(sorted);
             
+        }else{
+            setSortedHistory(glucoseHistory);
         }
     }, [glucoseHistory]);
 
